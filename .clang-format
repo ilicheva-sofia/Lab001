@@ -1,0 +1,19 @@
+BasedOnStyle: Google
+Language: Cpp
+
+# 1. Размер таба / отступа равен 4 пробелам
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never # Заменяет табы на пробелы (рекомендуется для C++)
+
+# 2. Фигурные скобки { открываются на той же строчке через пробел
+BreakBeforeBraces: Attach
+
+# 3. Настройка для namespace
+# В стиле Google по умолчанию отступы внутри namespace не делаются.
+# Если вам нужен отступ внутри namespace, смените "None" на "All".
+NamespaceIndentation: All
+
+# 4. Поведение амперсанда (ссылок &) и звездочек (указателей *)
+# Опция Left прижимает & к типу данных (например: int& ref = x;)
+PointerAlignment: Left

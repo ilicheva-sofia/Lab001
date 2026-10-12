@@ -1,36 +1,40 @@
+#pragma once
 #include <cstdint>
-#include <stdexcept>
+// #include <stdexcept>
+
 #include "DomainError.hpp"
 
-
-namespace Values{
+namespace Values {
 
     class Money {
-        private:
+       private:
         std::int64_t kopecks;
-        public:
+
+       public:
         constexpr Money(std::int64_t kopecks) : kopecks(kopecks) {
-        if (kopecks < 0)
-          throw  Exceptions::InvalidMoney(kopecks);
-      }
+            if (kopecks < 0) throw Exceptions::InvalidMoney(kopecks);
+        }
 
-      std::int64_t get_kopecks() const { return kopecks; }
+        std::int64_t get_kopecks() const { return kopecks; }
 
-      bool operator==(const Money &other) const {
-        return kopecks == other.kopecks;
-      }
+        bool operator==(const Money& other) const {
+            return kopecks == other.kopecks;
+        }
 
-      bool operator>(const Money &other) const {
-        return kopecks > other.kopecks;
-      }
+        bool operator>(const Money& other) const {
+            return kopecks > other.kopecks;
+        }
 
-      Money operator+(const Money &other) const {
-        return {kopecks + other.kopecks};
-      }
+        bool operator<(const Money& other) const {
+            return kopecks < other.kopecks;
+        }
 
-      Money operator-(const Money &other) const {
-        return {kopecks - other.kopecks};
-      }
+        Money operator+(const Money& other) const {
+            return {kopecks + other.kopecks};
+        }
+
+        Money operator-(const Money& other) const {
+            return {kopecks - other.kopecks};
+        }
     };
-}
-
+}  // namespace Values
