@@ -10,9 +10,10 @@ using namespace Values;
 namespace Exceptions {
     class DomainError : public std::runtime_error {
        public:
-        explicit DomainError(std::string& message)
+        explicit DomainError(const std::string& message)
             : std::runtime_error(message) {}
     };
+
     class InvalidMoney : public DomainError {
         std::int64_t kopecks;
 
@@ -23,6 +24,7 @@ namespace Exceptions {
                   kopecks)),
               kopecks(kopecks) {}
     };
+
     class InvalidNumber : public DomainError {
         std::int8_t number;
 
@@ -46,6 +48,14 @@ namespace Exceptions {
               max_money(max_money) {}
     };
 
-    class InvalidBet : public Domainerror {};
+    class InvalidPlayerId : public DomainError {
+        std::int64_t number;
 
+       public:
+        InvalidPlayerId(std::int64_t number)
+            : DomainError(
+                  std::format("неправильное значение для игрока : {}", number)),
+              number(number) {}
+    };
+    class InvalidBet : public DomainError {};
 }  // namespace Exceptions

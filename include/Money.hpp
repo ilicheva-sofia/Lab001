@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-// #include <stdexcept>
+#include <format>
 
 #include "DomainError.hpp"
 
@@ -38,3 +38,15 @@ namespace Values {
         }
     };
 }  // namespace Values
+
+namespace std {
+    template <>
+    struct formatter<Values::Money> : formatter<string_view> {
+        constexpr auto format(const Values::Money& money,
+                              format_context& ctx) const {
+            const auto kopecks = money.get_kopecks();
+            return format_to(ctx.out(), "{}.{:02} RUB", kopecks / 100,
+                             kopecks % 100);
+        }
+    };
+}  // namespace std
