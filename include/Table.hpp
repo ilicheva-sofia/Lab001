@@ -1,5 +1,11 @@
 #pragma once
+#include <vector>
+
+#include "Bet.hpp"
 #include "Money.hpp"
+#include "PlayerId.hpp"
+#include "RandomGenerator.hpp"
+#include "SpinResult.hpp"
 #include "Tablelimits.hpp"
 
 namespace Aggregates {
@@ -13,9 +19,9 @@ namespace Aggregates {
 
        public:
         Table(Money balance, Tablelimits limits)
-            : balance(balance) limits(limits) {}
-        void accept_bet(PlayerId id, Bet bet);
+            : balance(balance), limits(limits) {}
+        void accept_bet(PlayerId id, Bets::Bet bet);
         std::pair<PlayerId, Money> payout();
-        SpinResult spin(RandomGenerator& rg);
-    }
-};  // namespace Aggregates
+        SpinResult spin(Ports::RandomGenerator& rg);
+    };
+}  // namespace Aggregates
