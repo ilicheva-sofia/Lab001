@@ -57,5 +57,12 @@ namespace Exceptions {
                   std::format("неправильное значение для игрока : {}", number)),
               number(number) {}
     };
-    class InvalidBet : public DomainError {};
+    class BetOutsideLimits : public DomainError {
+        Money money;
+
+       public:
+        BetOutsideLimits(Money money)
+            : DomainError(std::format("ставка вне лимитов стола : {}", money)),
+              money(money) {}
+    };
 }  // namespace Exceptions
