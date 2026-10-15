@@ -36,6 +36,10 @@ namespace Values {
         Money operator-(const Money& other) const {
             return {kopecks - other.kopecks};
         }
+
+        Money operator*(const Money& other) const {
+            return {kopecks * other.kopecks};
+        }
     };
 }  // namespace Values
 
