@@ -3,8 +3,10 @@
 void main(void) {
     // new Random Generator (pure for  game,  fake for test)
     // new logger :  memory, file, sql
-    // new  player's  repo ????
-    // new  table's  repo ????
+    // new  player's  repo PlayerRepository   which one
+    // InMemoryPlayerRepository, FilePlayerRepository, SQLightPlayerRepository
+    // new  table's  repo TableRepository .. which one InMemoryTableRepository,
+    // FileTableRepository, SQLightTableRepository
 
     // new table ,  what is the  balance of table  // log  balance
     // add  table to table repo  , how many tables  // log ?? what ??
