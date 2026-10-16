@@ -1,8 +1,9 @@
 #include "Money.hpp"
 #include "PlayerId.hpp"
 
-namespace entities {
-    using namespace Values;
+namespace Domain {
+    using Values::Money;
+    using Values::PlayerId;
 
     class Player {
         PlayerId id;
@@ -18,4 +19,4 @@ namespace entities {
         void place_bet(Money amount);       //  balance --
     };
 
-}  // namespace entities
+}  // namespace Domain

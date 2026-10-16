@@ -1,3 +1,4 @@
+#pragma once
 #include "RouletteNumber.hpp"
 
 namespace Ports {

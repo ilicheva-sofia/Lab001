@@ -9,10 +9,10 @@
 #include "SpinResult.hpp"
 #include "Tablelimits.hpp"
 
-using namespace Bets;
-using namespace Ports;
-
 namespace Aggregates {
+    using Bets::Bet;
+    using Ports::RandomGenerator;
+
     struct PlacedBet {
         PlayerId player;
         std::unique_ptr<Bet> bet;

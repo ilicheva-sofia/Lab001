@@ -5,9 +5,8 @@
 
 #include "Money.hpp"
 
-using namespace Values;
-
 namespace Exceptions {
+    using Values::Money;
     class DomainError : public std::runtime_error {
        public:
         explicit DomainError(const std::string& message)
@@ -57,6 +56,17 @@ namespace Exceptions {
                   std::format("неправильное значение для игрока : {}", number)),
               number(number) {}
     };
+
+    class InvalidTableId : public DomainError {
+        std::int64_t number;
+
+       public:
+        InvalidTableId(std::int64_t number)
+            : DomainError(
+                  std::format("неправильное значение для стола : {}", number)),
+              number(number) {}
+    };
+
     class BetOutsideLimits : public DomainError {
         Money money;
 

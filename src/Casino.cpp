@@ -14,6 +14,7 @@ void main(void) {
 
     // player[i] makes new  bet :  numer or color, etc
     // player[i] place bet to table[j]
+    // Одно вращение — один результат для всех
     // table [j] accept bet -  check table  limits exception   // log  bet
     // spin result  = table [j].spin(& randomGenerator)  -  log  spin  result
     // for each player on table[j]  check  bet  with SpinResult  - where ??
