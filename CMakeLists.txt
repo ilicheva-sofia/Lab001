@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(lab001 LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+include(FetchContent)
+set(SQLITECPP_INTERNAL_SQLITE ON CACHE BOOL "Build bundled SQLite" FORCE)
+set(SQLITECPP_BUILD_TESTS OFF CACHE BOOL "No SQLiteCpp tests" FORCE)
+set(SQLITECPP_BUILD_EXAMPLES OFF CACHE BOOL "No SQLiteCpp examples" FORCE)
+FetchContent_Declare(sqlitecpp
+    GIT_REPOSITORY https://github.com/SRombauts/SQLiteCpp.git
+    GIT_TAG 3.3.3
+    GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(sqlitecpp)
+
+add_executable(lab001 src/FileLogger.cpp)
+target_compile_features(lab001 PRIVATE cxx_std_20)
+target_include_directories(lab001 PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(lab001 PRIVATE SQLiteCpp)
