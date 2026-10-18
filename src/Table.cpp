@@ -1,29 +1,56 @@
 #include "Table.hpp"
 
-#include "Bet.hpp"
+#include <iostream>
+
 #include "DomainError.hpp"
-#include "RandomGenerator.hpp"
 
-void Aggregates::Table::accept_bet(Values::PlayerId id,
-                                   std::unique_ptr<Bets::Bet> bet) {
-    auto m = bet->amount();
-    if (!limits.accepts(m)) throw Exceptions::BetOutsideLimits(m);
+namespace Aggregates {
 
-    bets.push_back(PlacedBet{id, std::move(bet)});
-}
+    Table::Table(Values::Money initial_balance,
+                 Values::Tablelimits table_limits)
+        : balance(initial_balance), limits(table_limits) {}
 
-SpinResult Aggregates::Table::spin(Ports::RandomGenerator& rg) {
-    int raw_number = rg.next();
-    Values::RouletteNumber winning_number(raw_number);
-    std::vector<PayoutEntry> payouts;
+    void Table::accept_bet(Values::PlayerId id,
+                           std::unique_ptr<Bets::Bet> bet) {
+        limits.validate(bet->get_amount());
 
-    for (const auto& placed_bet : bets) {
-        Money payout = placed_bet.bet->payout(winning_number);
-        if (payout > Values::Money::zero()) {
-            payouts.push_back({placed_bet.player, payout});
-        }
+        balance += bet->get_amount();
+        bets.push_back(PlacedBet{id, std::move(bet)});
     }
 
-    bets.clear();
-    return SpinResult{winning_number, payouts};
-}
+    Values::SpinResult Table::spin(Ports::RandomGenerator& rg) {
+        Values::RouletteNumber winning_number = rg.next();
+
+        std::vector<Values::PayoutEntry> payouts;
+        Values::Money total_payout_needed = Values::Money::zero();
+
+        for (const auto& placed_bet : bets) {
+            Values::Money payout = placed_bet.bet->payout(winning_number);
+            if (payout > Values::Money::zero()) {
+                payouts.push_back(placed_bet.player, payout);
+                total_payout_needed += payout;
+            }
+        }
+
+        if (total_payout_needed > balance) {
+            roll_back();
+            bets.clear();
+            return Values::SpinResult(winning_number,
+                                      Values::SpinStatus::Cancelled, {});
+        }
+
+        balance -= total_payout_needed;
+        bets.clear();
+
+        return Values::SpinResult(winning_number, Values::SpinStatus::Completed,
+                                  payouts);
+    }
+
+    void Table::roll_back() {
+        std::cout << "[ОТМЕНА ХОДА] У казино не хватило денег на выплаты! "
+                     "Возврат ставок.\n";
+        for (const auto& placed_bet : bets) {
+            balance -= placed_bet.bet->get_amount();
+        }
+    }
+}  // namespace Aggregates

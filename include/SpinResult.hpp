@@ -1,24 +1,29 @@
 #pragma once
-
+#include <vector>
 // SpinResult — это именно слепок результата вращения, а не сам процесс
 // вращения.  поэтому это ValueObject
 
 #include "PayoutEntry.hpp"
-#include "SpinStatus.hpp"
+#include "RouletteNumber.hpp"
 
 namespace Values {
 
+    enum class SpinStatus { Completed, Cancelled };
+
     class SpinResult {
+       private:
         RouletteNumber number;
         SpinStatus status;  // Completed, Cancelled
         std::vector<PayoutEntry> payouts;
 
        public:
-        SpinResult(RouletteNumber rn, SpinStatus ss,
-                   std::vector<PayoutEntry> pe);
-        const RouletteNumber& number() const;
-        SpinStatus status() const;
-        const std::vector<PayoutEntry>& payouts() const;
-        bool operator==(const SpinResult&) const;
+        SpinResult(RouletteNumber number, SpinStatus status,
+                   std::vector<PayoutEntry> payouts)
+            : number(number), status(status), payouts(std::move(payouts)) {}
+
+        const RouletteNumber& get_number() const { return number; }
+        SpinStatus get_status() const { return status; }
+        const std::vector<PayoutEntry>& get_payouts() const { return payouts; }
     };
+
 }  // namespace Values

@@ -1,43 +1,45 @@
 #pragma once
+#include <string>
+
+#include "Money.hpp"
 #include "RouletteNumber.hpp"
 
 namespace Bets {
 
     struct Bet {
-        virtual Money amount() const = 0;
-        virtual Money payout(const RouletteNumber& result) const = 0;
-        virtual std::string describe()
-            const = 0;  // "Red 1000" или "Number 17 500"
+        virtual Values::Money get_amount() const = 0;
+        virtual Values::Money payout(
+            const Values::RouletteNumber& result) const = 0;
+        virtual std::string describe() const = 0;
         virtual ~Bet() = default;
     };
 
     class ColorBet : public Bet {
-        Money amount;
-        Color color;
+       private:
+        Values::Money amount;
+        Values::Color color;
 
        public:
-        ColorBet(Money amount, Color color) : amount(amount), color(color) {}
-        Money amount() const override { return amount; }
-        Money payout(const RouletteNumber& result) const override {
-            if (result.color() == color)
-                return amount + amount;  // 1:1 + возврат
-            return Money{0};
-        }
+        ColorBet(Values::Money amount, Values::Color color);
+
+        Values::Money get_amount() const override;
+        Values::Money payout(
+            const Values::RouletteNumber& result) const override;
+        std::string describe() const override;
     };
 
     class SingleNumberBet : public Bet {
-        Money amount;
-        RouletteNumber number;
+       private:
+        Values::Money amount;
+        Values::RouletteNumber number;
 
        public:
-        SingleNumberBet(Money amount, RouletteNumber number)
-            : amount(amount), number(number) {}
-        Money amount() const override { return amount; }
-        Money payout(const RouletteNumber& result) const override {
-            if (result == number)
-                return amount * 35 + amount;  // 35:1 + возврат
-            return Money{0};
-        }
+        SingleNumberBet(Values::Money amount, Values::RouletteNumber number);
+
+        Values::Money get_amount() const override;
+        Values::Money payout(
+            const Values::RouletteNumber& result) const override;
+        std::string describe() const override;
     };
 
 }  // namespace Bets
