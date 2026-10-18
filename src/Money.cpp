@@ -4,8 +4,6 @@
 
 namespace Values {
 
-    constexpr Money::Money() : kopecks(0) {}
-
     constexpr Money::Money(std::int64_t kopecks) : kopecks(kopecks) {
         if (kopecks < 0) {
             // Передаем объект Money, созданный через приватный "безопасный"
@@ -13,10 +11,6 @@ namespace Values {
             throw Exceptions::InvalidMoney(Money(kopecks, true));
         }
     }
-
-    Money Money::zero() { return Money(0); }
-
-    std::int64_t Money::get_kopecks() const { return kopecks; }
 
     bool Money::operator==(const Money& other) const {
         return kopecks == other.kopecks;
