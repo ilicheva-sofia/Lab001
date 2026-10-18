@@ -36,12 +36,3 @@ void Infrastructure::FileLogger::log(const std::string& message) {
         logFile << ss.str();
     }
 }
-/*
-void Infrastructure::FileLogger::log_payout(PlayerId player_id, Money amount) {
-    log(std::format(" выплата игроку : {}  в количестве : {}", player_id,
-                    amount));
-}
-void Infrastructure::FileLogger::log_balance(Player player) {}
-void Infrastructure::FileLogger::log_bet(PlayerId player_id, Bet& bet) {}
-void Infrastructure::FileLogger::log_exceptions(std::string str) {}
-*/

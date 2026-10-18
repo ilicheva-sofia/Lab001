@@ -1,7 +1,9 @@
 
 #include <memory>
 
+#include "FileLogger.hpp"
 #include "InMemoryPlayerRepository.hpp"
+#include "LoggingService.hpp"
 #include "PlayerRepository.hpp"
 #include "RealRandomGenerator.hpp"
 
@@ -11,10 +13,9 @@ void main(void) {
     //    rng = std::make_unique<FakeGenerator>();
 
     // new logger :  memory, file, sql
-    // 2. Создаем логгер
     std::unique_ptr<Logger> logger = std::make_unique<FileLogger>("game.log");
+    Infrastructure::LoggingService loggingService(*fileLogger);
 
-    // 3. Создаем репозитории
     // new  player's  repo PlayerRepository   which one
     // InMemoryPlayerRepository, FilePlayerRepository, SQLightPlayerRepository
 
@@ -27,26 +28,21 @@ void main(void) {
     std::unique_ptr<TableRepository> tableRepo =
         std::make_unique<InMemoryTableRepository>();
 
-    // 4. Создаем игровые столы
     // new table ,  what is the  balance of table  // log  balance
     // add  table to table repo  , how many tables  // log ?? what ??
 
     Table table(10000);  // начальный баланс стола
     tableRepo->add(table);
-    logger->log("Table created with balance: " +
-                std::to_string(table.getBalance()));
+    loggingService->log_newTable(table);
 
-    // 5. Создаем игроков
     // new player , what is the balance of player  //  log  balance
     // add player  to player repo , how many players //  log ??
 
     Player player(1000);  // начальный баланс игрока
     playerRepo->add(player);
-    logger->log("Player created with balance: " +
-                std::to_string(player.getBalance()));
+    loggingService->log_newPlayer(player);
 
-    // 6. Создаем GameService со всеми зависимостями
-    GameService gameService(*rng, *logger, *playerRepo, *tableRepo);
+    GameService gameService(*rng, *loggingService, *playerRepo, *tableRepo);
 
     // player[i] makes new  bet :  numer or color, etc
     // player[i] place bet to table[j]

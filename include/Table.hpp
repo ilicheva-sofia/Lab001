@@ -31,5 +31,6 @@ namespace Aggregates {
             : balance(balance), limits(limits) {}
         void accept_bet(PlayerId id, std::unique_ptr<Bet> bet);
         SpinResult spin(RandomGenerator& rg);
+        const Money& balance() const { return balance; }
     };
 }  // namespace Aggregates
