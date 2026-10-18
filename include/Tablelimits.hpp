@@ -1,6 +1,4 @@
 #pragma once
-#include <cstdint>
-
 #include "Money.hpp"
 
 namespace Values {
@@ -10,14 +8,10 @@ namespace Values {
         Money max_money;
 
        public:
-        constexpr Tablelimits(Money min_money, Money max_money)
-            : min_money(min_money), max_money(max_money) {
-            if (max_money < min_money)
-                throw Exceptions::InvalidTablelimits(min_money, max_money);
-        }
-        bool accepts(Money amount) {
-            if ((amount < min_money) && (amount > max_money)) return 1;
-            return 0;
-        }
+        Tablelimits(Money min_money, Money max_money);
+
+        bool accepts(Money amount) const;
+
+        void validate(Money amount) const;
     };
 }  // namespace Values

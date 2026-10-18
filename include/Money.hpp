@@ -2,64 +2,38 @@
 #include <cstdint>
 #include <format>
 
-#include "DomainError.hpp"
+namespace Exceptions {
+    class InvalidMoney;
+}
 
 namespace Values {
     class Money {
        private:
         std::int64_t kopecks;
 
+        // Приватный конструктор без проверок для безопасной сборки объектов
+        // внутри исключений
+        constexpr explicit Money(std::int64_t kopecks, bool /*unused*/)
+            : kopecks(kopecks) {}
+
        public:
-        constexpr Money(std::int64_t kopecks) : kopecks(kopecks) {
-            if (kopecks < 0) throw Exceptions::InvalidMoney(kopecks);
-        }
+        constexpr Money();
+        constexpr explicit Money(std::int64_t kopecks);
 
-        static Money zero() { return Money(0); }
+        static Money zero();
+        std::int64_t get_kopecks() const;
 
-        std::int64_t get_kopecks() const { return kopecks; }
+        bool operator==(const Money& other) const;
+        bool operator>(const Money& other) const;
+        bool operator<(const Money& other) const;
+        bool operator>=(const Money& other) const;
+        bool operator<=(const Money& other) const;
 
-        bool operator==(const Money& other) const {
-            return kopecks == other.kopecks;
-        }
-
-        bool operator>(const Money& other) const {
-            return kopecks > other.kopecks;
-        }
-
-        bool operator<(const Money& other) const {
-            return kopecks < other.kopecks;
-        }
-
-        Money operator+(const Money& other) const {
-            return {kopecks + other.kopecks};
-        }
-
-        Money operator-(const Money& other) const {
-            if (kopecks < other.kopecks) {
-                throw Exceptions::InvalidMoneyOperation(kopecks -
-                                                        other.kopecks);
-            }
-
-            return {kopecks - other.kopecks};
-        }
-
-        Money& operator+=(const Money& other) {
-            kopecks += other.kopecks;
-            return *this;
-        }
-
-        Money& operator-=(const Money& other) {
-            if (kopecks < other.kopecks) {
-                throw Exceptions::InvalidMoneyOperation(kopecks -
-                                                        other.kopecks);
-            }
-            kopecks -= other.kopecks;
-            return *this;
-        }
-
-        Money operator*(const Money& other) const {
-            return {kopecks * other.kopecks};
-        }
+        Money operator+(const Money& other) const;
+        Money operator-(const Money& other) const;
+        Money& operator+=(const Money& other) { return *this = *this + other; }
+        Money& operator-=(const Money& other) { return *this = *this - other; }
+        Money operator*(std::int64_t factor) const;
     };
 }  // namespace Values
 
@@ -70,7 +44,7 @@ namespace std {
                               format_context& ctx) const {
             const auto kopecks = money.get_kopecks();
             return format_to(ctx.out(), "{}.{:02} RUB", kopecks / 100,
-                             kopecks % 100);
+                             kopecks % 100);  // [3]
         }
     };
 }  // namespace std
