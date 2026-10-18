@@ -1,6 +1,6 @@
 #pragma once
 
-// #include ""
+#include "Logger.hpp"
 #include "PlayerRepository.hpp"
 #include "RandomGenerator.hpp"
 #include "SpinResult.hpp"
@@ -19,7 +19,7 @@ namespace Domain {
     class GameService {
         PlayerRepository& players;
         TableRepository& tables;
-        //        Logger& logger;
+        Logger& logger;
 
        public:
         // Фаза 1: приём ставок — можно вызвать много раз для разных игроков
@@ -29,6 +29,7 @@ namespace Domain {
         SpinResult spin(TableId tid, RandomGenerator& rng);
         void save_table(TableId tid);
         Table load_table(TableId tid);
+        void startGame();
     };
 
 }  // namespace Domain

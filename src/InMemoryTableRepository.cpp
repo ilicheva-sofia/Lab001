@@ -1,3 +1,3 @@
-class InMemoryTableRepository : public TableRepository {
-    // реализация сохранения в памяти
-};
+#include "InMemoryTableRepository.hpp"
+
+InMemoryTableRepository::InMemoryTableRepository() {}

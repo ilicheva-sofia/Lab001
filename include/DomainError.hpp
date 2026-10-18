@@ -24,6 +24,15 @@ namespace Exceptions {
               kopecks(kopecks) {}
     };
 
+    class InvalidMoneyOperation : public DomainError {
+        std::int64_t kopecks;
+
+       public:
+        InvalidMoneyOperation(std::int64_t kopecks)
+            : DomainError(std::format(" Недостаточно средств : {}", kopecks)),
+              kopecks(kopecks) {}
+    };
+
     class InvalidNumber : public DomainError {
         std::int8_t number;
 
@@ -40,9 +49,9 @@ namespace Exceptions {
 
        public:
         InvalidTablelimits(Money min_money, Money max_money)
-            : DomainError(std::format(
-                  " минимум не может быть больше максимума : {}, {}", min_money,
-                  max_money)),
+            : DomainError(
+                  std::format("минимум не может быть больше максимума : {}, {}",
+                              min_money, max_money)),
               min_money(min_money),
               max_money(max_money) {}
     };
@@ -74,5 +83,15 @@ namespace Exceptions {
         BetOutsideLimits(Money money)
             : DomainError(std::format("ставка вне лимитов стола : {}", money)),
               money(money) {}
+    };
+
+    class FileLoggerError : public DomainError {
+        std::string filePath;
+
+       public:
+        FileLoggerError(const std::string& path)
+            : DomainError(
+                  std::format("не удалось открыть файл лога: {}", path)),
+              filePath(path) {}
     };
 }  // namespace Exceptions

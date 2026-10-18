@@ -15,6 +15,8 @@ namespace Values {
             if (kopecks < 0) throw Exceptions::InvalidMoney(kopecks);
         }
 
+        static Money zero() { return Money(0); }
+
         std::int64_t get_kopecks() const { return kopecks; }
 
         bool operator==(const Money& other) const {
@@ -34,7 +36,26 @@ namespace Values {
         }
 
         Money operator-(const Money& other) const {
+            if (kopecks < other.kopecks) {
+                throw Exceptions::InvalidMoneyOperation(kopecks -
+                                                        other.kopecks);
+            }
+
             return {kopecks - other.kopecks};
+        }
+
+        Money& operator+=(const Money& other) {
+            kopecks += other.kopecks;
+            return *this;
+        }
+
+        Money& operator-=(const Money& other) {
+            if (kopecks < other.kopecks) {
+                throw Exceptions::InvalidMoneyOperation(kopecks -
+                                                        other.kopecks);
+            }
+            kopecks -= other.kopecks;
+            return *this;
         }
 
         Money operator*(const Money& other) const {

@@ -15,8 +15,8 @@ namespace Domain {
 
         PlayerId get_id() const { return id; }  // do we need it?
         const Money& balance() const { return balance; }
-        void receive_payout(Money amount);  //  balance ++
-        void place_bet(Money amount);       //  balance --
+        void receive_payout(Money amount);       //  balance ++
+        void place_bet(Table& table, Bet& bet);  //  balance --
     };
 
 }  // namespace Domain

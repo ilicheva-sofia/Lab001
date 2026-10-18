@@ -1,6 +1,7 @@
 
 #include <memory>
 
+#include "InMemoryPlayerRepository.hpp"
 #include "PlayerRepository.hpp"
 #include "RealRandomGenerator.hpp"
 

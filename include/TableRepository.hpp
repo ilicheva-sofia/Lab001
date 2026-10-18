@@ -14,10 +14,6 @@ namespace Repository {
         virtual ~TableRepository() = default;
     };
 
-    class InMemoryTableRepository : public TableRepository {
-        // реализация сохранения в памяти
-    };
-
     class FileTableRepository : public TableRepository {
         // реализация сохранения в файл
     };
