@@ -12,6 +12,8 @@
 namespace Aggregates {
     using Bets::Bet;
     using Ports::RandomGenerator;
+    using Values::Money;
+    using Values::PlayerId;
 
     struct PlacedBet {
         PlayerId player;
@@ -28,7 +30,7 @@ namespace Aggregates {
 
        public:
         Table(Money balance, Tablelimits limits)
-            : balance(balance), limits(limits) {}
+            : : balance(balance), limits(limits) {}
         void accept_bet(PlayerId id, std::unique_ptr<Bet> bet);
         SpinResult spin(RandomGenerator& rg);
         const Money& balance() const { return balance; }

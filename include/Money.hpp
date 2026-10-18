@@ -5,7 +5,6 @@
 #include "DomainError.hpp"
 
 namespace Values {
-
     class Money {
        private:
         std::int64_t kopecks;

@@ -15,7 +15,6 @@ namespace Domain {
 
         SpinResult result = table.spin(rng);  // одно вращение, все ставки сразу
 
-        // Выплаты — по каждому игроку в результате
         for (const auto& entry : result.payouts()) {
             Player player = players.load(entry.player).value();
             player.receive_payout(entry.amount);
@@ -29,26 +28,28 @@ namespace Domain {
         return result;
     }
 
-    void GameService::place_bet(PlayerId pid, TableId tid,
+    void GameService::place_bet(PlayerId player_id, TableId tid,
                                 std::unique_ptr<Bet>& bet) {
-        Player player = players.load(pid).value();
-        RouletteTable table = tables.load(tid).value();
+        Player player = players.load(player_id).value();
+        Table table = tables.load(tid).value();
 
         try {
-            player.place_bet(table, bet);  // снять деньги у игрока
-        } catch (const Exceptions::InsufficientFundsException& e) {
-            logger->log_exceptions("Недостаточно средств у игрока");
+            player.place_bet(bet);  // снять деньги у игрока
+            logger->log_bet(player_id, const Bet& bet) {}
+            catch (const Exceptions::InsufficientFundsException& e) {
+                logger->log_exceptions("Недостаточно средств у игрока");
+                try {
+                    table.accept_bet(
+                        pid, std::move(bet));  // передать ставку на стол
+                } catch (const Exceptions::InvalidAmountException& e) {
+                    logger->log_exceptions("Некорректная сумма ставки");
+                }
 
-        } catch (const Exceptions::InvalidAmountException& e) {
-            logger->log_exceptions("Некорректная сумма ставки");
-        }
-        table.accept_bet(pid, std::move(bet));  // передать ставку на стол
+                players.save(player);
+                tables.save(table);
+                logger.log_bet(pid, bet);
+            }
 
-        players.save(player);
-        tables.save(table);
-        logger.log_bet(pid, bet);
-    }
+            void GameService::startGame() {}
 
-    void GameService::startGame() {}
-
-}  // namespace Domain
+        }  // namespace Domain

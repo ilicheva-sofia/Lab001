@@ -38,11 +38,14 @@ void main(void) {
     // new player , what is the balance of player  //  log  balance
     // add player  to player repo , how many players //  log ??
 
-    Player player(1000);  // начальный баланс игрока
+    Player player(2000);  // начальный баланс игрока
     playerRepo->add(player);
     loggingService->log_newPlayer(player);
 
     GameService gameService(*rng, *loggingService, *playerRepo, *tableRepo);
+
+    player->place_bet(ColorBet{Color::Red});
+    table.accept_bet(bet);
 
     // player[i] makes new  bet :  numer or color, etc
     // player[i] place bet to table[j]

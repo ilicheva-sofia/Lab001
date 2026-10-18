@@ -8,10 +8,9 @@ void Domain::Player::receive_payout(Money amount) {
 }
 
 // Размещение ставки
-void Domain::Player::place_bet(Table& table, Bet& bet) {
+void Domain::Player::place_bet(Bet& bet) {
     if (bet->amount() > balance) {
         throw InsufficientFundsException(amount, balance);
     }
     balance -= amount;
-    table.accept_bet(*this, bet);
 }

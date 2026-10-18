@@ -6,7 +6,6 @@
 #include "Money.hpp"
 
 namespace Exceptions {
-    using Values::Money;
     class DomainError : public std::runtime_error {
        public:
         explicit DomainError(const std::string& message)
@@ -44,11 +43,11 @@ namespace Exceptions {
     };
 
     class InvalidTablelimits : public DomainError {
-        Money min_money;
-        Money max_money;
+        Values::Money min_money;
+        Values::Money max_money;
 
        public:
-        InvalidTablelimits(Money min_money, Money max_money)
+        InvalidTablelimits(Values::Money min_money, Values::Money max_money)
             : DomainError(
                   std::format("минимум не может быть больше максимума : {}, {}",
                               min_money, max_money)),

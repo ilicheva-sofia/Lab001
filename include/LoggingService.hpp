@@ -52,4 +52,9 @@ namespace Infrastructure {
                         std::to_string(player.balance()));
         };
 
-    }  // namespace Infrastructure
+        void log_spin_result(const Values::RouletteNumber& number) {
+            logger.log(std::format("результат спина: {}", number));
+        }
+    }
+
+}  // namespace Infrastructure
