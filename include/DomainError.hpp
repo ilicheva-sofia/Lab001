@@ -40,6 +40,10 @@ namespace Exceptions {
        public:
         explicit InvalidPlayerId(std::int64_t id);
     };
+    class InvalidTableId : public DomainError {
+       public:
+        explicit InvalidTableId(std::int64_t id);
+    };
 
     class BetOutsideLimits : public DomainError {
        public:

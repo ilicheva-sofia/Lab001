@@ -5,10 +5,9 @@
 #include "DomainError.hpp"
 
 namespace Aggregates {
-
-    Table::Table(Values::Money initial_balance,
+    Table::Table(Values::TableId id, Values::Money initial_balance,
                  Values::Tablelimits table_limits)
-        : balance(initial_balance), limits(table_limits) {}
+        : id(id), balance(initial_balance), limits(table_limits) {}
 
     void Table::accept_bet(Values::PlayerId id,
                            std::unique_ptr<Bets::Bet> bet) {

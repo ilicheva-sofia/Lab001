@@ -5,56 +5,59 @@
 #include "Bet.hpp"
 #include "Logger.hpp"
 #include "Money.hpp"
-#include "PayoutEntry.hpp"
 #include "Player.hpp"
 #include "PlayerId.hpp"
+#include "RouletteNumber.hpp"
+#include "Table.hpp"
 
 namespace Infrastructure {
-    using Bets::Bet;
-    using Domain::Player;
-    using Ports::Logger;
-    using Values::Money;
-    using Values::PlayerId;
-
     class LoggingService {
        private:
-        Logger& logger;
+        Ports::Logger& logger;
 
        public:
-        explicit LoggingService(Logger& logger) : logger(logger) {}
+        explicit LoggingService(Ports::Logger& logger) : logger(logger) {}
 
-        void log_payout(PlayerId player_id, Money amount) {
-            logger.log(std::format("выплата игроку: {} в количестве: {}",
-                                   player_id, amount));
+        void log(const std::string& message) { logger.log(message); }
+
+        void log_payout(Values::PlayerId player_id, Values::Money amount) {
+            logger.log(std::format("Выплата игроку ID {}: {}",
+                                   player_id.get_value(), amount));
         }
 
-        void log_balance(const Player& player) {
-            logger.log(
-                std::format("обновление баланса игрока: {} новый баланс: {}",
-                            player.get_id(), player.balance()));
+        void log_balance(const Domain::Player& player) {
+            logger.log(std::format("Обновление баланса игрока ID {}: {}",
+                                   player.get_id().get_value(),
+                                   player.get_balance()));
         }
 
-        void log_bet(PlayerId player_id, const Bet& bet) {
-            logger.log(std::format("ставка игрока: {} сумма: {} тип: {}",
-                                   player_id, bet.get_amount(),
-                                   bet.get_type()));
+        void log_bet(Values::PlayerId player_id, const Bets::Bet& bet) {
+            logger.log(std::format("Ставка игрока ID {}: {}",
+                                   player_id.get_value(), bet.describe()));
         }
 
         void log_exceptions(const std::string& error_message) {
-            logger.log(std::format("ошибка: {}", error_message));
+            logger.log(std::format("[ОШИБКА] {}", error_message));
         }
-        void log_newTable(const Table& table) {
-            logger->log("Table created with balance: " +
-                        std::to_string(table.balance()));
-        }
-        void log_newPlayer(const Player& player) {
-            logger->log("Player created with balance: " +
-                        std::to_string(player.balance()));
-        };
 
-        void log_spin_result(const Values::RouletteNumber& number) {
-            logger.log(std::format("результат спина: {}", number));
+        void log_newTable(const Aggregates::Table& table) {
+            logger.log(std::format("Игровой стол создан с балансом: {}",
+                                   table.get_balance()));
         }
-    }
 
+        void log_newPlayer(const Domain::Player& player) {
+            logger.log(std::format("Игрок ID {} вошел с балансом: {}",
+                                   player.get_id().get_value(),
+                                   player.get_balance()));
+        }
+
+        void log_spin_result(Values::RouletteNumber number) {
+            std::string colorStr =
+                (number.color() == Values::Color::Red)     ? "Красное"
+                : (number.color() == Values::Color::Black) ? "Черное"
+                                                           : "Зеленое (Зеро)";
+            logger.log(std::format("Рулетка выдала число: {} ({})",
+                                   number.value(), colorStr));
+        }
+    };
 }  // namespace Infrastructure

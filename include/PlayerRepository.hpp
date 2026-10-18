@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <optional>
 
 #include "Player.hpp"
@@ -6,17 +7,10 @@
 
 namespace Repository {
 
-    using Domain::Player;
-    using Values::PlayerId;
-
     struct PlayerRepository {
-        virtual std::optional<Player> load(PlayerId id) = 0;
-        virtual void save(const Player& player) = 0;
+        virtual std::optional<Domain::Player> load(Values::PlayerId id) = 0;
+        virtual void save(const Domain::Player& player) = 0;
         virtual ~PlayerRepository() = default;
-    };
-
-    class InMemoryPlayerRepository : public PlayerRepository {
-        // реализация сохранения в памяти
     };
 
     class FilePlayerRepository : public PlayerRepository {
@@ -24,7 +18,7 @@ namespace Repository {
     };
 
     class SQLightPlayerRepository : public PlayerRepository {
-        // реализация сохранения в файл
+        // реализация сохранения в БД
     };
 
 }  // namespace Repository

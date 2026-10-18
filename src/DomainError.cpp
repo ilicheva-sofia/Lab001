@@ -30,6 +30,9 @@ namespace Exceptions {
         : DomainError(std::format("Неправильное значение для игрока: {}", id)) {
     }
 
+    InvalidTableId::InvalidTableId(std::int64_t id)
+        : DomainError(std::format("Неправильное значение для стола: {}", id)) {}
+
     BetOutsideLimits::BetOutsideLimits(const Values::Money& money)
         : DomainError(std::format("Ставка вне лимитов стола: {}", money)) {}
 }  // namespace Exceptions
