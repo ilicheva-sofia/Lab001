@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
+include(CTest) 
+
 set(SQLITECPP_INTERNAL_SQLITE ON CACHE BOOL "Build bundled SQLite" FORCE)
 set(SQLITECPP_BUILD_TESTS OFF CACHE BOOL "No SQLiteCpp tests" FORCE)
 set(SQLITECPP_BUILD_EXAMPLES OFF CACHE BOOL "No SQLiteCpp examples" FORCE)
@@ -16,10 +18,30 @@ FetchContent_Declare(sqlitecpp
     GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(sqlitecpp)
 
-add_executable(lab001 src/Table.cpp src/FileLogger.cpp
-    src/Money.cpp src/DomainError.cpp src/Tablelimits.cpp
-    src/PlayerId.cpp src/Player.cpp
-    src/RouletteNumber.cpp)
+
+FetchContent_Declare(googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.17.0
+)
+FetchContent_MakeAvailable(googletest)
+
+add_library(casino_lib
+    src/Money.cpp 
+    src/DomainError.cpp 
+    src/Tablelimits.cpp
+    src/PlayerId.cpp 
+    src/Player.cpp
+    src/RouletteNumber.cpp
+    src/RealRandomGenerator.cpp
+    src/FileLogger.cpp
+)
+target_include_directories(casino_lib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+target_link_libraries(casino_lib PRIVATE SQLiteCpp)
+
+add_executable(lab001 src/Casino.cpp) 
 target_compile_features(lab001 PRIVATE cxx_std_20)
-target_include_directories(lab001 PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(lab001 PRIVATE SQLiteCpp)
+target_link_libraries(lab001 PRIVATE casino_lib)
+
+enable_testing()
+add_subdirectory(tests)
