@@ -1,13 +1,11 @@
 #include "Money.hpp"
 
-#include "DomainError.hpp"  // Теперь подключаем здесь — безопасно!
+#include "DomainError.hpp"
 
 namespace Values {
 
     constexpr Money::Money(std::int64_t kopecks) : kopecks(kopecks) {
         if (kopecks < 0) {
-            // Передаем объект Money, созданный через приватный "безопасный"
-            // конструктор
             throw Exceptions::InvalidMoney(Money(kopecks, true));
         }
     }
@@ -35,7 +33,7 @@ namespace Values {
     Money Money::operator-(const Money& other) const {
         if (kopecks < other.kopecks) {
             throw Exceptions::InvalidMoneyOperation(
-                "Недостаточно средств на балансе");  // [2]
+                "Недостаточно средств на балансе");
         }
         return Money(kopecks - other.kopecks);
     }

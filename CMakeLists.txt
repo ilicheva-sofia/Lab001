@@ -17,7 +17,9 @@ FetchContent_Declare(sqlitecpp
 FetchContent_MakeAvailable(sqlitecpp)
 
 add_executable(lab001 src/Table.cpp src/FileLogger.cpp
-    src/Money.cpp src/DomainError.cpp src/Tablelimits.cpp)
+    src/Money.cpp src/DomainError.cpp src/Tablelimits.cpp
+    src/PlayerId.cpp src/Player.cpp
+    src/RouletteNumber.cpp)
 target_compile_features(lab001 PRIVATE cxx_std_20)
 target_include_directories(lab001 PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(lab001 PRIVATE SQLiteCpp)

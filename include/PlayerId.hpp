@@ -1,18 +1,19 @@
 #pragma once
 #include <cstdint>
 
-#include "DomainError.hpp"
-
 namespace Values {
     class PlayerId {
-        std::int64_t value;
+       private:
+        std::int64_t id;
 
        public:
-        explicit PlayerId(std::int64_t value) : value(value) {
-            if (value <= 0) throw Exceptions::InvalidPlayerId(value);
-        }
-        bool operator==(const PlayerId& other) const {
-            return value == other.value;
-        }
+        explicit PlayerId(std::int64_t id);
+
+        std::int64_t get_id() const { return id; }
+
+        bool operator==(const PlayerId& other) const { return id == other.id; }
+        bool operator<(const PlayerId& other) const {
+            return id < other.id;
+        }  // Нужно для std::map/set
     };
 }  // namespace Values

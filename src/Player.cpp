@@ -1,16 +1,17 @@
 #include "Player.hpp"
 
-void Domain::Player::receive_payout(Money amount) {
-    if (amount <= Money::zero()) {
-        throw InvalidAmountException("Выигрыш должен быть положительным");
-    }
-    balance += amount;
-}
+#include "DomainError.hpp"
 
-// Размещение ставки
-void Domain::Player::place_bet(Bet& bet) {
-    if (bet->amount() > balance) {
-        throw InsufficientFundsException(amount, balance);
+namespace Domain {
+
+    Player::Player(Values::PlayerId id, Values::Money init_balance)
+        : id(id), balance(init_balance) {}
+
+    void Player::receive_payout(Values::Money amount) { balance += amount; }
+
+    void Player::spend_money(Values::Money amount) {
+        // operation-= throws InvalidMoneyOperation
+        balance -= amount;
     }
-    balance -= amount;
-}
+
+}  // namespace Domain

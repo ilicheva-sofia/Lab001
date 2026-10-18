@@ -3,21 +3,18 @@
 #include "PlayerId.hpp"
 
 namespace Domain {
-    using Values::Money;
-    using Values::PlayerId;
-
     class Player {
-        PlayerId id;
-        Money balance;
+       private:
+        Values::PlayerId id;
+        Values::Money balance;
 
        public:
-        Player(PlayerId id, Money init_balance)
-            : id(id), balance(init_balance) {}
+        Player(Values::PlayerId id, Values::Money init_balance);
 
-        PlayerId get_id() const { return id; }  // do we need it?
-        const Money& balance() const { return balance; }
-        void receive_payout(Money amount);       //  balance ++
-        void place_bet(Table& table, Bet& bet);  //  balance --
+        Values::PlayerId get_id() const { return id; }
+        Values::Money get_balance() const { return balance; }
+
+        void receive_payout(Values::Money amount);  //  balance ++
+        void spend_money(Values::Money amount);     //  balance --
     };
-
 }  // namespace Domain
