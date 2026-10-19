@@ -26,16 +26,18 @@ FetchContent_Declare(googletest
 FetchContent_MakeAvailable(googletest)
 
 add_library(casino_lib
-    src/Money.cpp 
+    src/Bet.cpp
     src/DomainError.cpp 
+    src/FileLogger.cpp
+    src/GameService.cpp
+    src/Money.cpp 
+    src/Player.cpp
+    src/PlayerId.cpp 
+    src/RealRandomGenerator.cpp
+    src/RouletteNumber.cpp
     src/Table.cpp
     src/Tablelimits.cpp
-    src/PlayerId.cpp 
-    src/Player.cpp
-    src/RouletteNumber.cpp
-    src/RealRandomGenerator.cpp
-    src/FileLogger.cpp
-    src/Bet.cpp
+
 )
 target_include_directories(casino_lib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 

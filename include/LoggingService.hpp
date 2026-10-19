@@ -22,18 +22,18 @@ namespace Infrastructure {
 
         void log_payout(Values::PlayerId player_id, Values::Money amount) {
             logger.log(std::format("Выплата игроку ID {}: {}",
-                                   player_id.get_value(), amount));
+                                   player_id.get_id(), amount));
         }
 
         void log_balance(const Domain::Player& player) {
             logger.log(std::format("Обновление баланса игрока ID {}: {}",
-                                   player.get_id().get_value(),
+                                   player.get_id().get_id(),
                                    player.get_balance()));
         }
 
         void log_bet(Values::PlayerId player_id, const Bets::Bet& bet) {
             logger.log(std::format("Ставка игрока ID {}: {}",
-                                   player_id.get_value(), bet.describe()));
+                                   player_id.get_id(), bet.describe()));
         }
 
         void log_exceptions(const std::string& error_message) {
@@ -47,7 +47,7 @@ namespace Infrastructure {
 
         void log_newPlayer(const Domain::Player& player) {
             logger.log(std::format("Игрок ID {} вошел с балансом: {}",
-                                   player.get_id().get_value(),
+                                   player.get_id().get_id(),
                                    player.get_balance()));
         }
 

@@ -13,10 +13,11 @@ namespace Infrastructure {
 
        public:
         explicit FileLogger(const std::string& path);
-        // Деструктор для корректного закрытия файла
-        ~FileLogger();
 
-        void log(const std::string& message);
+        // Деструктор для корректного закрытия файла
+        ~FileLogger() override;
+
+        void log(const std::string& message) override;
     };
 
 }  // namespace Infrastructure

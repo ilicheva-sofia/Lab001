@@ -1,3 +1,4 @@
+#pragma once
 namespace Ports {
 
     struct Logger {

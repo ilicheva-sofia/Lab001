@@ -7,12 +7,12 @@
 
 namespace Repository {
 
-    class InMemoryplayerRepository : public PlayerRepository {
+    class InMemoryPlayerRepository : public PlayerRepository {
        private:
         std::map<std::int64_t, Domain::Player> players;
 
        public:
-        InMemoryplayerRepository() = default;
+        InMemoryPlayerRepository() = default;
 
         std::optional<Domain::Player> load(Values::PlayerId id) override {
             if (players.contains(id.get_id())) {
@@ -25,7 +25,7 @@ namespace Repository {
             players.insert_or_assign(table.get_id().get_id(), table);
         }
 
-        ~InMemoryplayerRepository() override = default;
+        ~InMemoryPlayerRepository() override = default;
     };
 
 }  // namespace Repository
