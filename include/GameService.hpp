@@ -6,8 +6,11 @@
 #include "LoggingService.hpp"
 #include "Player.hpp"
 #include "PlayerId.hpp"
+#include "PlayerRepository.hpp"
 #include "SpinResult.hpp"
 #include "Table.hpp"
+#include "TableId.hpp"
+#include "TableRepository.hpp"
 
 namespace Domain {
     class GameService {
@@ -24,6 +27,7 @@ namespace Domain {
 
         void place_bet(Values::PlayerId pid, Values::TableId tid,
                        std::unique_ptr<Bets::Bet> bet);
+
         Values::SpinResult spin(Values::TableId tid,
                                 Ports::RandomGenerator& rng);
 

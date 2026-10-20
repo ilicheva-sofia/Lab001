@@ -1,55 +1,78 @@
-
 #include "GameService.hpp"
+
+#include <format>
+
+#include "DomainError.hpp"
+
 namespace Domain {
-    Table GameService::load_table(TableId tid) {
-        return tables.load(tid).value();
-    }
-    void GameService::save_table(TableId tid) {
-        Table table = tables.load(tid).value();
-        // доменная логика
-        tables.save(table);
-    }
 
-    SpinResult GameService::spin(TableId tid, RandomGenerator& rng) {
-        Table table = tables.load(tid).value();
+    Values::SpinResult GameService::spin(Values::TableId tid,
+                                         Ports::RandomGenerator& rng) {
+        auto table_opt = tables.load(tid);
+        if (!table_opt) {
+            logger.log_exceptions("Стол для прокрутки рулетки не найден!");
+            throw std::runtime_error("Table not found");
+        }
 
-        SpinResult result = table.spin(rng);  // одно вращение, все ставки сразу
+        Aggregates::Table& table = table_opt.value();
 
-        for (const auto& entry : result.payouts()) {
-            Player player = players.load(entry.player).value();
-            player.receive_payout(entry.amount);
-            players.save(player);
-            logger.log_payout(entry.player, entry.amount);
-            logger.log_balance(entry.player, player.balance());
+        Values::SpinResult result = table.spin(rng);
+        logger.log_spin_result(result.get_number());
+
+        if (result.get_status() == Values::SpinStatus::Completed) {
+            for (const auto& entry : result.get_payouts()) {
+                auto player_opt = players.load(entry.player);
+                if (player_opt) {
+                    Domain::Player& player = player_opt.value();
+                    player.receive_payout(entry.amount);
+                    players.save(player);
+
+                    logger.log_payout(entry.player, entry.amount);
+                    logger.log_balance(player);
+                }
+            }
+        } else {
+            logger.log_exceptions(
+                "Вращение отменено из-за форс-мажора (банкротство стола). "
+                "Ставки аннулированы.");
         }
 
         tables.save(table);
-        logger.log_spin(result);
         return result;
     }
 
-    void GameService::place_bet(PlayerId player_id, TableId tid,
-                                std::unique_ptr<Bet>& bet) {
-        Player player = players.load(player_id).value();
-        Table table = tables.load(tid).value();
+    void GameService::place_bet(Values::PlayerId pid, Values::TableId tid,
+                                std::unique_ptr<Bets::Bet> bet) {
+        auto player_opt = players.load(pid);
+        auto table_opt = tables.load(tid);
+
+        if (!player_opt || !table_opt) {
+            logger.log_exceptions("Игрок или Стол не найдены в системе!");
+            return;
+        }
+
+        Domain::Player& player = player_opt.value();
+        Aggregates::Table& table = table_opt.value();
 
         try {
-            player.place_bet(bet);  // снять деньги у игрока
-            logger->log_bet(player_id, const Bet& bet) {}
-            catch (const Exceptions::InsufficientFundsException& e) {
-                logger->log_exceptions("Недостаточно средств у игрока");
-                try {
-                    table.accept_bet(
-                        pid, std::move(bet));  // передать ставку на стол
-                } catch (const Exceptions::InvalidAmountException& e) {
-                    logger->log_exceptions("Некорректная сумма ставки");
-                }
+            player.spend_money(bet->get_amount());
+            logger.log_bet(pid, *bet);
+            table.accept_bet(pid, std::move(bet));
 
-                players.save(player);
-                tables.save(table);
-                logger.log_bet(pid, bet);
-            }
+            players.save(player);
+            tables.save(table);
 
-            void GameService::startGame() {}
+        } catch (const Exceptions::InvalidMoneyOperation& e) {
+            logger.log_exceptions(std::format("Ошибка списание у игрока {}: {}",
+                                              pid.get_id(), e.what()));
+        } catch (const Exceptions::BetOutsideLimits& e) {
+            logger.log_exceptions(
+                std::format("Ставка не принята столом: {}", e.what()));
+        }
+    }
 
-        }  // namespace Domain
+    void GameService::startGame() {
+        logger.log("Сервис управления игрой успешно инициализирован.");
+    }
+
+}  // namespace Domain
