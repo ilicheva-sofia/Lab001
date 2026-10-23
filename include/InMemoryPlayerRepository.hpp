@@ -1,31 +1,31 @@
 #pragma once
 #include <map>
-#include <optional>
+#include <memory>
 
 #include "Player.hpp"
-#include "PlayerRepository.hpp"
+#include "PlayerId.hpp"
 
 namespace Repository {
 
     class InMemoryPlayerRepository : public PlayerRepository {
        private:
-        std::map<std::int64_t, Domain::Player> players;
+        std::map<std::int64_t, std::shared_ptr<Domain::Player>> m_players;
 
        public:
         InMemoryPlayerRepository() = default;
 
-        std::optional<Domain::Player> load(Values::PlayerId id) override {
-            if (players.contains(id.get_id())) {
-                return players.at(id.get_id());
+        std::shared_ptr<Domain::Player> load(Values::PlayerId id) override {
+            if (m_players.contains(id.get_id())) {
+                return m_players.at(id.get_id());
             }
-            return std::nullopt;
+            return nullptr;  // Если не нашли, возвращаем пустой указатель
         }
 
-        void save(const Domain::Player& table) override {
-            players.insert_or_assign(table.get_id().get_id(), table);
+        void save(std::shared_ptr<Domain::Player> player) override {
+            if (player) {
+                m_players.insert_or_assign(player->get_id().get_id(), player);
+            }
         }
-
         ~InMemoryPlayerRepository() override = default;
     };
-
 }  // namespace Repository

@@ -1,14 +1,6 @@
 #include "Money.hpp"
 
-#include "DomainError.hpp"
-
 namespace Values {
-
-    constexpr Money::Money(std::int64_t kopecks) : kopecks(kopecks) {
-        if (kopecks < 0) {
-            throw Exceptions::InvalidMoney(Money(kopecks, true));
-        }
-    }
 
     bool Money::operator==(const Money& other) const {
         return kopecks == other.kopecks;
@@ -26,16 +18,30 @@ namespace Values {
         return kopecks <= other.kopecks;
     }
 
-    Money Money::operator+(const Money& other) const {
-        return Money(kopecks + other.kopecks);
+    Money& Money::operator+=(const Money& other) {
+        kopecks += other.kopecks;
+        return *this;
     }
 
-    Money Money::operator-(const Money& other) const {
+    Money& Money::operator-=(const Money& other) {
         if (kopecks < other.kopecks) {
             throw Exceptions::InvalidMoneyOperation(
                 "Недостаточно средств на балансе");
         }
-        return Money(kopecks - other.kopecks);
+        kopecks -= other.kopecks;
+        return *this;
+    }
+
+    Money Money::operator+(const Money& other) const {
+        Money result = *this;
+        result += other;
+        return result;
+    }
+
+    Money Money::operator-(const Money& other) const {
+        Money result = *this;
+        result -= other;
+        return result;
     }
 
     Money Money::operator*(std::int64_t factor) const {

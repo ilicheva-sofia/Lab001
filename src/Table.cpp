@@ -26,7 +26,8 @@ namespace Aggregates {
         for (const auto& placed_bet : bets) {
             Values::Money payout = placed_bet.bet->payout(winning_number);
             if (payout > Values::Money::zero()) {
-                payouts.push_back(placed_bet.player, payout);
+                payouts.push_back(
+                    Values::PayoutEntry(placed_bet.player, payout));
                 total_payout_needed += payout;
             }
         }

@@ -1,6 +1,5 @@
 #pragma once
-#include <map>
-#include <optional>
+#include <memory>
 
 #include "Player.hpp"
 #include "PlayerId.hpp"
@@ -8,8 +7,8 @@
 namespace Repository {
 
     struct PlayerRepository {
-        virtual std::optional<Domain::Player> load(Values::PlayerId id) = 0;
-        virtual void save(const Domain::Player& player) = 0;
+        virtual std::shared_ptr<Domain::Player> load(Values::PlayerId id) = 0;
+        virtual void save(std::shared_ptr<Domain::Player> player) = 0;
         virtual ~PlayerRepository() = default;
     };
 

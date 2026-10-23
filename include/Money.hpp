@@ -2,9 +2,7 @@
 #include <cstdint>
 #include <format>
 
-namespace Exceptions {
-    class InvalidMoney;
-}
+#include "DomainError.hpp"
 
 namespace Values {
     class Money {
@@ -17,7 +15,11 @@ namespace Values {
 
        public:
         constexpr Money() : kopecks(0) {}
-        constexpr explicit Money(std::int64_t kopecks);
+        constexpr explicit Money(std::int64_t kopecks) : kopecks(kopecks) {
+            if (kopecks < 0) {
+                throw Exceptions::InvalidMoney(Money(kopecks, true));
+            }
+        }
 
         static constexpr Money zero() { return Money(); }
 

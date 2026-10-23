@@ -1,28 +1,28 @@
 #pragma once
 #include <map>
-#include <optional>
 
-#include "Table.hpp"
 #include "TableRepository.hpp"
 
 namespace Repository {
 
     class InMemoryTableRepository : public TableRepository {
        private:
-        std::map<std::int64_t, Aggregates::Table> tables;
+        std::map<std::int64_t, std::shared_ptr<Aggregates::Table>> tables;
 
        public:
         InMemoryTableRepository() = default;
 
-        std::optional<Aggregates::Table> load(Values::TableId id) override {
+        std::shared_ptr<Aggregates::Table> load(Values::TableId id) override {
             if (tables.contains(id.get_id())) {
                 return tables.at(id.get_id());
             }
-            return std::nullopt;
+            return nullptr;  // Если не нашли, возвращаем пустой указатель
         }
 
-        void save(const Aggregates::Table& table) override {
-            tables.insert_or_assign(table.get_id().get_id(), table);
+        void save(std::shared_ptr<Aggregates::Table> table) override {
+            if (table) {
+                tables.insert_or_assign(table->get_id().get_id(), table);
+            }
         }
 
         ~InMemoryTableRepository() override = default;
