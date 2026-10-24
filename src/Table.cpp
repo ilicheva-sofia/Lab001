@@ -25,11 +25,10 @@ namespace Aggregates {
 
         for (const auto& placed_bet : bets) {
             Values::Money payout = placed_bet.bet->payout(winning_number);
-            if (payout > Values::Money::zero()) {
-                payouts.push_back(
-                    Values::PayoutEntry(placed_bet.player, payout));
-                total_payout_needed += payout;
-            }
+            // add all besides of win to have logging outside
+            payouts.push_back(Values::PayoutEntry(placed_bet.player, payout));
+
+            total_payout_needed += payout;
         }
 
         if (total_payout_needed > balance) {

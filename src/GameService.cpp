@@ -20,16 +20,27 @@ namespace Domain {
         if (result.get_status() == Values::SpinStatus::Completed) {
             for (const auto& entry : result.get_payouts()) {
                 auto player = players.load(entry.player);
-                if (player) {
+                if (!player) continue;
+
+                if (entry.amount > Values::Money::zero()) {
                     player->receive_payout(entry.amount);
                     players.save(player);
-
                     logger.log_payout(entry.player, entry.amount);
-                    logger.log_balance(*player);
+                } else {
+                    logger.log(std::format("Игрок ID {} проиграл ставку.",
+                                           entry.player.get_id()));
                 }
+
+                logger.log_balance(*player);
             }
+
+            logger.log(std::format("Касса стола после раунда: {}",
+                                   table->get_balance()));
+
         } else {
-            logger.log_exceptions("Вращение отменено. Ставки аннулированы.");
+            logger.log_exceptions(
+                "Вращение отменено из-за форс-мажора (банкротство стола). "
+                "Ставки аннулированы.");
         }
 
         tables.save(table);
