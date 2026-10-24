@@ -39,8 +39,23 @@ namespace Domain {
 
         } else {
             logger.log_exceptions(
-                "Вращение отменено из-за форс-мажора (банкротство стола). "
-                "Ставки аннулированы.");
+                "Вращение отменено! Баланс стола недостаточен для выплат. "
+                "Запущен возврат ставок.");
+
+            for (const auto& entry : result.get_payouts()) {
+                auto player = players.load(entry.player);
+                if (!player) continue;
+
+                player->receive_payout(entry.amount);
+                players.save(player);
+
+                logger.log(std::format(
+                    "[ВОЗВРАТ] Ставка {} возвращена на счет игрока ID {}.",
+                    entry.amount, entry.player.get_id()));
+                logger.log_balance(*player);
+            }
+            logger.log(std::format("Касса стола после возврата ставок: {}",
+                                   table->get_balance()));
         }
 
         tables.save(table);

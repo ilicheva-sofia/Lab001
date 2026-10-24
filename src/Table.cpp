@@ -32,10 +32,21 @@ namespace Aggregates {
         }
 
         if (total_payout_needed > balance) {
-            roll_back();
+            // write return data instead of payouts
+            payouts.clear();
+
+            std::cout << "[ОТМЕНА ХОДА] У казино не хватило денег на выплаты! "
+                         "Возврат ставок игрокам.\n";
+
+            for (const auto& placed_bet : bets) {
+                balance -= placed_bet.bet->get_amount();
+                payouts.push_back(Values::PayoutEntry(
+                    placed_bet.player, placed_bet.bet->get_amount()));
+            }
+
             bets.clear();
             return Values::SpinResult(winning_number,
-                                      Values::SpinStatus::Cancelled, {});
+                                      Values::SpinStatus::Cancelled, payouts);
         }
 
         balance -= total_payout_needed;
@@ -45,11 +56,4 @@ namespace Aggregates {
                                   payouts);
     }
 
-    void Table::roll_back() {
-        std::cout << "[ОТМЕНА ХОДА] У казино не хватило денег на выплаты! "
-                     "Возврат ставок.\n";
-        for (const auto& placed_bet : bets) {
-            balance -= placed_bet.bet->get_amount();
-        }
-    }
 }  // namespace Aggregates
