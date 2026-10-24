@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 
+#include "BotStrategy.hpp"
 #include "FileLogger.hpp"
 #include "GameService.hpp"
 #include "InMemoryPlayerRepository.hpp"
@@ -9,9 +10,10 @@
 #include "RealRandomGenerator.hpp"
 #include "Tablelimits.hpp"
 
-int main(void) {
+int main() {
     // new Random Generator (pure for  game,  fake for test)
-    auto rng = std::make_unique<Infrastructure::RealRandomGenerator>();
+    // 42 - seed
+    auto rng = std::make_unique<Infrastructure::RealRandomGenerator>(42);
     //    rng = std::make_unique<FakeGenerator>();
 
     // new logger :  memory, file, sql
@@ -32,30 +34,31 @@ int main(void) {
     tableRepo->save(table);
     loggingService->log_newTable(*table);
 
-    Values::PlayerId pid(1);
-    auto player = std::make_shared<Domain::Player>(pid, Values::Money(5000'00));
-    playerRepo->save(player);
-    loggingService->log_newPlayer(*player);
+    Values::Money start_capital(10000'00);
+
+    auto player1 =
+        std::make_shared<Domain::Player>(Values::PlayerId(1), start_capital);
+    playerRepo->save(player1);
+    loggingService->log_newPlayer(*player1);
+
+    auto player2 =
+        std::make_shared<Domain::Player>(Values::PlayerId(2), start_capital);
+    playerRepo->save(player2);
+    loggingService->log_newPlayer(*player2);
+
+    std::vector<std::shared_ptr<Domain::BotStrategy>> bots;
+    bots.push_back(std::make_shared<Domain::RedConstantBot>(
+        "Осторожный-Ред", Values::Money(5000'00), Values::Money(3000'00),
+        start_capital, Values::Money(200'00)));
+
+    bots.push_back(std::make_shared<Domain::MartingaleBot>(
+        "Мартингейл-Блэк", Values::Money(5000'00), Values::Money(5000'00),
+        start_capital, Values::Money(100'00)));
 
     Domain::GameService gameService(*playerRepo, *tableRepo, *loggingService);
-    // player[i] makes new  bet :  numer or color, etc
-    // player[i] place bet to table[j]
-    // Одно вращение — один результат для всех
-    // table [j] accept bet -  check table  limits exception   // log  bet
-    // spin result  = table [j].spin(& randomGenerator)  -  log  spin  result
-    // for each player on table[j]  check  bet  with SpinResult  - where ??
-    //       player balance ++  table balance --     //  log  balance
-    gameService.startGame();
 
-    std::cout << "--- РАУНД 1: Размещение ставок ---\n";
-    gameService.place_bet(pid, tid,
-                          std::make_unique<Bets::ColorBet>(
-                              Values::Money(1000'00), Values::Color::Red));
+    gameService.startGame(bots, tid, *rng, 100);
 
-    std::cout << "--- РАУНД 1: Вращение рулетки ---\n";
-    gameService.spin(tid, *rng);
-
-    std::cout
-        << "Симуляция успешно завершена! Результаты записаны в файл game.log\n";
+    std::cout << "Результаты успешно сохранены в файл game.log\n";
     return 0;
 }

@@ -40,18 +40,18 @@ namespace Infrastructure {
             logger.log(std::format("[ОШИБКА] {}", error_message));
         }
 
-        void log_newTable(const Aggregates::Table& table) {
+        void log_newTable(const Aggregates::Table& table) {  // with each player
             logger.log(std::format("Игровой стол создан с балансом: {}",
                                    table.get_balance()));
         }
 
-        void log_newPlayer(const Domain::Player& player) {
+        void log_newPlayer(const Domain::Player& player) {  // with each player
             logger.log(std::format("Игрок ID {} вошел с балансом: {}",
                                    player.get_id().get_id(),
                                    player.get_balance()));
         }
 
-        void log_spin_result(Values::RouletteNumber number) {
+        void log_spin_result(Values::RouletteNumber number) {  // 1  time
             std::string colorStr =
                 (number.color() == Values::Color::Red)     ? "Красное"
                 : (number.color() == Values::Color::Black) ? "Черное"

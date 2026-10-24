@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "Bet.hpp"
+#include "BotStrategy.hpp"
 #include "LoggingService.hpp"
 #include "Player.hpp"
 #include "PlayerId.hpp"
@@ -31,6 +32,8 @@ namespace Domain {
         Values::SpinResult spin(Values::TableId tid,
                                 Ports::RandomGenerator& rng);
 
-        void startGame();
+        void startGame(std::vector<std::shared_ptr<Domain::BotStrategy>>& bots,
+                       Values::TableId tid, Ports::RandomGenerator& rng,
+                       int max_rounds = 100);
     };
 }  // namespace Domain

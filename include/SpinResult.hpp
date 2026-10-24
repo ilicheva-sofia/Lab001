@@ -5,10 +5,9 @@
 
 #include "PayoutEntry.hpp"
 #include "RouletteNumber.hpp"
+#include "SpinStatus.hpp"
 
 namespace Values {
-
-    enum class SpinStatus { Completed, Cancelled };
 
     class SpinResult {
        private:
