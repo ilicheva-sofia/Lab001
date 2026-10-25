@@ -1,7 +1,11 @@
 
 add_executable(run_all_tests
-    RouletteTest.cpp
     TestRandomGenerator.cpp
+    MoneyTest.cpp
+    RouletteNumberTest.cpp
+    BetPayoutTest.cpp
+    TableLimitsTest.cpp
+    TableAggregateTest.cpp
 )
 
 

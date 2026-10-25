@@ -19,19 +19,19 @@ namespace Domain {
 
     class BotStrategy {
        protected:
-        Values::Money m_target_profit;    // Цель по выигрышу (Take-Profit)
-        Values::Money m_stop_loss;        // Лимит потерь (Stop-Loss)
-        Values::Money m_initial_balance;  // С чем бот зашел за стол
-        std::string m_name;
+        Values::Money target_profit;    // Цель по выигрышу (Take-Profit)
+        Values::Money stop_loss;        // Лимит потерь (Stop-Loss)
+        Values::Money initial_balance;  // С чем бот зашел за стол
+        std::string name;               //  Имя бота
 
        public:
         BotStrategy(const std::string& name, Values::Money target_profit,
                     Values::Money stop_loss, Values::Money initial_balance);
         virtual ~BotStrategy() = default;
 
-        std::string get_name() const { return m_name; }
-        // Главный метод: бот оценивает баланс игрока и лимиты стола, а затем
-        // принимает решение
+        std::string get_name() const { return name; }
+        // Главный метод: бот оценивает баланс игрока и лимиты стола,
+        // а затем принимает решение
         virtual BotDecision make_decision(
             const Domain::Player& player,
             const Values::Tablelimits& limits) = 0;
