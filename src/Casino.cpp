@@ -4,8 +4,8 @@
 #include "BotStrategy.hpp"
 #include "FileLogger.hpp"
 #include "FilePlayerRepository.hpp"
+#include "FileTableRepository.hpp"
 #include "GameService.hpp"
-#include "InMemoryTableRepository.hpp"
 #include "LoggingService.hpp"
 #include "RealRandomGenerator.hpp"
 #include "Tablelimits.hpp"
@@ -25,7 +25,8 @@ int main() {
     auto playerRepo =
         std::make_unique<Repository::FilePlayerRepository>("player.txt");
     // FileTableRepository, SQLightTableRepository
-    auto tableRepo = std::make_unique<Repository::InMemoryTableRepository>();
+    auto tableRepo =
+        std::make_unique<Repository::FileTableRepository>("table.txt");
 
     Values::TableId tid(1);
     Values::Tablelimits limits(Values::Money(100'00), Values::Money(10000'00));

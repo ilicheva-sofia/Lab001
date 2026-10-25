@@ -12,10 +12,6 @@ namespace Repository {
         virtual ~TableRepository() = default;
     };
 
-    class FileTableRepository : public TableRepository {
-        // реализация сохранения в файл
-    };
-
     class SQLightTableRepository : public TableRepository {
         // реализация сохранения в БД
     };

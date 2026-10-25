@@ -13,5 +13,9 @@ namespace Values {
         bool accepts(Money amount) const;
 
         void validate(Money amount) const;
+
+        Money get_min_limits() const { return min_money; }
+
+        Money get_max_limits() const { return max_money; }
     };
 }  // namespace Values

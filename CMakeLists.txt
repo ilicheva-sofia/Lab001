@@ -44,6 +44,7 @@ add_library(casino_lib
     src/Table.cpp
     src/Tablelimits.cpp
     src/BotStrategy.cpp
+    src/FileTableRepository.cpp
 
 )
 target_include_directories(casino_lib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
