@@ -34,6 +34,7 @@ add_library(casino_lib
     src/Bet.cpp
     src/DomainError.cpp 
     src/FileLogger.cpp
+    src/FilePlayerRepository.cpp
     src/GameService.cpp
     src/Money.cpp 
     src/Player.cpp

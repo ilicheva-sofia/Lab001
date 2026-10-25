@@ -12,10 +12,6 @@ namespace Repository {
         virtual ~PlayerRepository() = default;
     };
 
-    class FilePlayerRepository : public PlayerRepository {
-        // реализация сохранения в файл
-    };
-
     class SQLightPlayerRepository : public PlayerRepository {
         // реализация сохранения в БД
     };

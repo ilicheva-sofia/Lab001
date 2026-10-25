@@ -3,8 +3,8 @@
 
 #include "BotStrategy.hpp"
 #include "FileLogger.hpp"
+#include "FilePlayerRepository.hpp"
 #include "GameService.hpp"
-#include "InMemoryPlayerRepository.hpp"
 #include "InMemoryTableRepository.hpp"
 #include "LoggingService.hpp"
 #include "RealRandomGenerator.hpp"
@@ -22,7 +22,8 @@ int main() {
         std::make_unique<Infrastructure::LoggingService>(*fileLogger);
 
     // InMemoryPlayerRepository, FilePlayerRepository, SQLightPlayerRepository
-    auto playerRepo = std::make_unique<Repository::InMemoryPlayerRepository>();
+    auto playerRepo =
+        std::make_unique<Repository::FilePlayerRepository>("player.txt");
     // FileTableRepository, SQLightTableRepository
     auto tableRepo = std::make_unique<Repository::InMemoryTableRepository>();
 
