@@ -73,6 +73,7 @@ namespace Domain {
             return;
         }
 
+        Values::Money bet_amount = bet->get_amount();
         try {
             player->spend_money(bet->get_amount());
             logger.log_bet(pid, *bet);
@@ -87,7 +88,12 @@ namespace Domain {
         } catch (const Exceptions::BetOutsideLimits& e) {
             logger.log_exceptions(
                 std::format("Ставка не принята столом: {}", e.what()));
+            player->receive_payout(bet_amount);
+            players.save(player);
         }
+        logger.log_balance(*player);
+        logger.log(std::format("Текущая касса стола ID {}: {}", tid.get_id(),
+                               table->get_balance()));
     }
 
     void GameService::startGame(

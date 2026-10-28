@@ -39,10 +39,6 @@ namespace Domain {
             return BotDecision{false, nullptr};  // Физически нет денег
         }
 
-        if (!limits.accepts(m_bet_amount)) {
-            return BotDecision{false, nullptr};
-        }
-
         return BotDecision{true, std::make_unique<Bets::ColorBet>(
                                      m_bet_amount, Values::Color::Red)};
     }
@@ -75,10 +71,6 @@ namespace Domain {
         if (current_balance < m_current_bet) {
             // Если на удвоенную ставку денег не хватает, стратегия Мартингейла
             // "ломается". Бот вынужден признать поражение и покинуть стол.
-            return BotDecision{false, nullptr};
-        }
-
-        if (!limits.accepts(m_current_bet)) {
             return BotDecision{false, nullptr};
         }
 

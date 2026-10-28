@@ -10,14 +10,9 @@ namespace Values {
         }
     }
 
-    bool Tablelimits::accepts(Money amount) const {
-        return (amount >= min_money) && (amount <= max_money);
+    bool Tablelimits::validate(Money amount) const {
+        return (amount > min_money || amount == min_money) &&
+               (amount < max_money || amount == max_money);
     }
 
-    void Tablelimits::validate(Money amount) const {
-        if (!accepts(amount)) {
-            // Кидаем исключение, передавая некорректную сумму ставки
-            throw Exceptions::BetOutsideLimits(amount);
-        }
-    }
 }  // namespace Values

@@ -11,9 +11,12 @@ namespace Aggregates {
 
     void Table::accept_bet(Values::PlayerId id,
                            std::unique_ptr<Bets::Bet> bet) {
-        limits.validate(bet->get_amount());
+        if (!bet) return;
+        auto amount = bet->get_amount();
+        if (!limits.validate(amount))
+            throw Exceptions::BetOutsideLimits(amount);
 
-        balance += bet->get_amount();
+        balance += amount;
         bets.push_back(PlacedBet{id, std::move(bet)});
     }
 

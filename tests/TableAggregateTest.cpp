@@ -76,3 +76,30 @@ TEST(TableAggregateTest, SuccessfulRoundWithPayouts) {
     // Проверяем баланс кассы стола после выигрыша
     EXPECT_EQ(table.get_balance(), Values::Money(99000'00));
 }
+
+TEST(TableAggregateTest, TableThrowsOnBetOutsideLimits) {
+    Values::TableId tid(1);
+    Values::Tablelimits limits(Values::Money(100'00),
+                               Values::Money(5000'00));  // Лимит 100 - 5000 руб
+
+    Aggregates::Table table(tid, Values::Money(100000'00), limits);
+    Values::PlayerId pid(1);
+
+    // Ставка меньше минимального лимита стола
+    EXPECT_THROW(
+        {
+            table.accept_bet(
+                pid, std::make_unique<Bets::ColorBet>(Values::Money(50'00),
+                                                      Values::Color::Red));
+        },
+        Exceptions::BetOutsideLimits);
+
+    // Ставка больше максимального лимита стола
+    EXPECT_THROW(
+        {
+            table.accept_bet(
+                pid, std::make_unique<Bets::ColorBet>(Values::Money(6000'00),
+                                                      Values::Color::Black));
+        },
+        Exceptions::BetOutsideLimits);
+}
