@@ -20,16 +20,16 @@ namespace Domain {
 
         if (result.get_status() == Values::SpinStatus::Completed) {
             for (const auto& entry : result.get_payouts()) {
-                auto player = players.load(entry.player);
+                auto player = players.load(entry.get_player());
                 if (!player) continue;
 
-                if (entry.amount > Values::Money::zero()) {
-                    player->receive_payout(entry.amount);
+                if (entry.get_amount() > Values::Money::zero()) {
+                    player->receive_payout(entry.get_amount());
                     players.save(player);
-                    logger.log_payout(entry.player, entry.amount);
+                    logger.log_payout(entry.get_player(), entry.get_amount());
                 } else {
                     logger.log(std::format("Игрок ID {} проиграл ставку.",
-                                           entry.player.get_id()));
+                                           entry.get_player().get_id()));
                 }
 
                 logger.log_balance(*player);
@@ -44,15 +44,15 @@ namespace Domain {
                 "Запущен возврат ставок.");
 
             for (const auto& entry : result.get_payouts()) {
-                auto player = players.load(entry.player);
+                auto player = players.load(entry.get_player());
                 if (!player) continue;
 
-                player->receive_payout(entry.amount);
+                player->receive_payout(entry.get_amount());
                 players.save(player);
 
                 logger.log(std::format(
                     "[ВОЗВРАТ] Ставка {} возвращена на счет игрока ID {}.",
-                    entry.amount, entry.player.get_id()));
+                    entry.get_amount(), entry.get_player().get_id()));
                 logger.log_balance(*player);
             }
             logger.log(std::format("Касса стола после возврата ставок: {}",
@@ -117,8 +117,8 @@ namespace Domain {
 
                 // Запрашиваем решение у бота
                 auto table_live = tables.load(tid);
-                Domain::BotDecision decision = bots[i]->make_decision(
-                    *player_live, table_live->get_limits());
+                Domain::BotDecision decision =
+                    bots[i]->make_decision(*player_live);
 
                 if (decision.wants_to_play) {
                     anyone_wants_to_play = true;

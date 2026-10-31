@@ -4,6 +4,7 @@
 
 #include "Player.hpp"
 #include "PlayerId.hpp"
+#include "PlayerRepository.hpp"
 
 namespace Repository {
 

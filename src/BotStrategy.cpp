@@ -19,8 +19,7 @@ namespace Domain {
         : BotStrategy(name, target_profit, stop_loss, initial_balance),
           m_bet_amount(bet_amount) {}
 
-    BotDecision RedConstantBot::make_decision(
-        const Domain::Player& player, const Values::Tablelimits& limits) {
+    BotDecision RedConstantBot::make_decision(const Domain::Player& player) {
         Values::Money current_balance = player.get_balance();
 
         if (current_balance > initial_balance + target_profit ||
@@ -53,8 +52,7 @@ namespace Domain {
           m_current_bet(base_bet),
           m_color(color) {}
 
-    BotDecision MartingaleBot::make_decision(
-        const Domain::Player& player, const Values::Tablelimits& limits) {
+    BotDecision MartingaleBot::make_decision(const Domain::Player& player) {
         Values::Money current_balance = player.get_balance();
 
         if (current_balance > initial_balance + target_profit ||
@@ -87,8 +85,8 @@ namespace Domain {
         bool won = false;
 
         for (const auto& payout : result.get_payouts()) {
-            if (payout.player.get_id() == pid.get_id() &&
-                payout.amount > Values::Money::zero()) {
+            if (payout.get_player().get_id() == pid.get_id() &&
+                payout.get_amount() > Values::Money::zero()) {
                 won = true;
                 break;
             }

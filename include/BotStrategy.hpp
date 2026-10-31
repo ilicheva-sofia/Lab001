@@ -32,9 +32,7 @@ namespace Domain {
         std::string get_name() const { return name; }
         // Главный метод: бот оценивает баланс игрока и лимиты стола,
         // а затем принимает решение
-        virtual BotDecision make_decision(
-            const Domain::Player& player,
-            const Values::Tablelimits& limits) = 0;
+        virtual BotDecision make_decision(const Domain::Player& player) = 0;
 
         virtual void update_result(const Values::SpinResult& result,
                                    Values::PlayerId pid) {}
@@ -50,8 +48,7 @@ namespace Domain {
                        Values::Money stop_loss, Values::Money initial_balance,
                        Values::Money bet_amount);
 
-        BotDecision make_decision(const Domain::Player& player,
-                                  const Values::Tablelimits& limits) override;
+        BotDecision make_decision(const Domain::Player& player) override;
     };
 
     // Бот, который всегда ставит на черное с удвоением ставок
@@ -68,8 +65,7 @@ namespace Domain {
                       Values::Money base_bet,
                       Values::Color color = Values::Color::Black);
 
-        BotDecision make_decision(const Domain::Player& player,
-                                  const Values::Tablelimits& limits) override;
+        BotDecision make_decision(const Domain::Player& player) override;
 
         // Переопределяем метод, чтобы анализировать выигрыш/проигрыш
         void update_result(const Values::SpinResult& result,
