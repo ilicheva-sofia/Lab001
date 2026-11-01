@@ -16,8 +16,8 @@ namespace Values {
         bool operator==(const PayoutEntry& other) const {
             return player == other.player && amount == other.amount;
         }
-        PlayerId get_player() { return player; }
-        Money get_amount() { return amount; }
+        PlayerId get_player() const { return player; }
+        Money get_amount() const { return amount; }
     };
 
 }  // namespace Values
