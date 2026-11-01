@@ -37,8 +37,8 @@ TEST(TableAggregateTest, CancelledRoundOnCasinoBankruptcy) {
     // Проверяем в payouts должен лежать возврат исходной ставки игрока (1 000
     // руб)
     ASSERT_EQ(result.get_payouts().size(), 1);
-    EXPECT_EQ(result.get_payouts()[0].player.get_id(), pid.get_id());
-    EXPECT_EQ(result.get_payouts()[0].amount, Values::Money(1000'00));
+    EXPECT_EQ(result.get_payouts()[0].get_player().get_id(), pid.get_id());
+    EXPECT_EQ(result.get_payouts()[0].get_amount(), Values::Money(1000'00));
 
     // Баланс кассы казино должен откатиться в норму (исходные 5 000 рублей)
     EXPECT_EQ(table.get_balance(), Values::Money(5000'00));
@@ -70,8 +70,8 @@ TEST(TableAggregateTest, SuccessfulRoundWithPayouts) {
 
     // Проверяем правильную выплату игроку (1000 * 2 = 2000 руб)
     ASSERT_EQ(result.get_payouts().size(), 1);
-    EXPECT_EQ(result.get_payouts()[0].player.get_id(), pid.get_id());
-    EXPECT_EQ(result.get_payouts()[0].amount, Values::Money(2000'00));
+    EXPECT_EQ(result.get_payouts()[0].get_player().get_id(), pid.get_id());
+    EXPECT_EQ(result.get_payouts()[0].get_amount(), Values::Money(2000'00));
 
     // Проверяем баланс кассы стола после выигрыша
     EXPECT_EQ(table.get_balance(), Values::Money(99000'00));
