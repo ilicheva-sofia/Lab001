@@ -114,19 +114,19 @@ void human_play() {
     constexpr std::string_view number_set = "чЧnN";
     std::cout << "Введите тип ставки игрока: цвет или число (" << color_set
               << "/" << number_set << ")";
-    char ans;
+    std::string ans;
     std::cin >> ans;
     std::unique_ptr<Bets::Bet> bet;
     if (color_set.find(ans) != std::string::npos) {
         constexpr std::string_view red_set = "кКrR";
         constexpr std::string_view black_set = "чЧbB";
         std::cout << "Введите цвет (" << red_set << "/" << black_set << ")";
-        char cc;
+        std::string cc;
         std::cin >> cc;
-        if (red_set.find(ans) != std::string::npos) {
+        if (red_set.find(cc) != std::string::npos) {
             bet = std::make_unique<Bets::ColorBet>(Values::Money{pamount},
                                                    Values::Color::Red);
-        } else if (black_set.find(ans) != std::string::npos) {
+        } else if (black_set.find(cc) != std::string::npos) {
             bet = std::make_unique<Bets::ColorBet>(Values::Money{pamount},
                                                    Values::Color::Black);
         } else {
@@ -135,11 +135,11 @@ void human_play() {
         }
 
     } else if (number_set.find(ans) != std::string::npos) {
-        std::int8_t digit;
+        int digit;
         std::cout << "Введите число ( от 0 до 36 )";
 
         std::cin >> digit;
-        std::cout << "Введнно ( от 0 до 36 )" << digit;
+        std::cout << "Введнно ( от 0 до 36 )" << digit << std::endl;
 
         bet = std::make_unique<Bets::SingleNumberBet>(
             Values::Money{pamount}, Values::RouletteNumber{digit});
@@ -189,7 +189,7 @@ void human_play() {
 }
 
 int main() {
-    char ans;
+    std::string ans;
     constexpr std::string_view set_of_bot_letters = "бБbB";
     constexpr std::string_view set_of_human_letters = "чЧhH";
     std::cout << "Кто будет играть:боты или человек? (введите символ) ("
