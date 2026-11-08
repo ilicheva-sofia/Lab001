@@ -87,13 +87,14 @@ void human_play() {
     std::cout << "Введите лимит стола через пробел минимум и максимум :";
 
     std::cin >> tmin >> tmax;
-    Values::Tablelimits limits{Values::Money(tmin), Values::Money(tmax)};
+    Values::Tablelimits limits{Values::Money(tmin * 100),
+                               Values::Money(tmax * 100)};
 
     std::int64_t tamount;
     std::cout << "Введите кассу стола :";
     std::cin >> tamount;
     auto table = std::make_shared<Aggregates::Table>(
-        tid, Values::Money(tamount), limits);
+        tid, Values::Money(tamount * 100), limits);
     tableRepo->save(table);
     loggingService->log_newTable(*table);
 
@@ -101,7 +102,7 @@ void human_play() {
     std::cout << "Введите баланс игрока :";
     std::cin >> pamount;
 
-    Values::Money start_capital(pamount);
+    Values::Money start_capital(pamount * 100);
     Values::PlayerId pid(1);
     auto player1 = std::make_shared<Domain::Player>(pid, start_capital);
     playerRepo->save(player1);
@@ -113,6 +114,20 @@ void human_play() {
     while (true) {
         std::cout << "Введите сумму ставки игрока :";
         std::cin >> pamount;
+
+        if (pamount < 0) {
+            std::cout << "Сумма ставки не может быть отрицательной."
+                      << std::endl;
+            continue;
+        }
+
+        Values::Money bet_amount{pamount * 100};
+        if (!limits.validate(bet_amount)) {
+            std::cout << std::format(
+                "Ставка не принята. Допустимый диапазон: {} — {}\n",
+                limits.get_min_limits(), limits.get_max_limits());
+            continue;
+        }
 
         std::cout << "Введите тип ставки игрока: цвет или число (" << color_set
                   << "/" << number_set << ")";
@@ -127,10 +142,10 @@ void human_play() {
             std::string cc;
             std::cin >> cc;
             if (red_set.find(cc) != std::string::npos) {
-                bet = std::make_unique<Bets::ColorBet>(Values::Money{pamount},
+                bet = std::make_unique<Bets::ColorBet>(bet_amount,
                                                        Values::Color::Red);
             } else if (black_set.find(cc) != std::string::npos) {
-                bet = std::make_unique<Bets::ColorBet>(Values::Money{pamount},
+                bet = std::make_unique<Bets::ColorBet>(bet_amount,
                                                        Values::Color::Black);
             } else {
                 std::cout << "Недопустимый ответ. Выходим" << std::endl;
@@ -149,7 +164,7 @@ void human_play() {
             std::cout << "Введено число ( от 0 до 36 )" << digit << std::endl;
 
             bet = std::make_unique<Bets::SingleNumberBet>(
-                Values::Money{pamount},
+                bet_amount,
                 Values::RouletteNumber{static_cast<std::int8_t>(digit)});
 
         } else {
@@ -171,6 +186,9 @@ void human_play() {
                                                                     : "ЗЕРО";
         std::cout << std::format("  Выпало число: {} ({})\n",
                                  result.get_number().value(), colorStr);
+        std::cout << std::format(
+            "  Текущий баланс игрока: {}\n",
+            playerRepo->load(pid)->get_balance());
 
         if (result.get_status() == Values::SpinStatus::Cancelled) {
             std::cout << "Стол обанкротился!" << std::endl;

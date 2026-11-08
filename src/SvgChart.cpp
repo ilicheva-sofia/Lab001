@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iomanip>
+#include <format>
 #include <limits>
 #include <sstream>
 
@@ -31,24 +31,17 @@ namespace Infrastructure {
             return out;
         }
 
-        // Форматируем число: без экспоненциальной формы
-        std::string fmt(double v) {
-            std::ostringstream oss;
-            oss << std::fixed << std::setprecision(0) << v;
-            std::string s = oss.str();
-            // Для больших чисел добавляем разделители тысяч
-            if (s.size() > 4 && s.find('.') == std::string::npos) {
-                std::string with_commas;
-                int count = 0;
-                for (auto it = s.rbegin(); it != s.rend(); ++it) {
-                    with_commas += *it;
-                    if (++count % 3 == 0 && count < s.size())
-                        with_commas += ',';
-                }
-                std::reverse(with_commas.begin(), with_commas.end());
-                s = with_commas;
-            }
-            return s;
+        double x_of(int point_index, double plot_width, int max_points) {
+            return margin_left +
+                   (plot_width * point_index) / (max_points - 1);
+        }
+
+        double y_of(double value, double plot_height, double min_value,
+                    double max_value) {
+            double clamped_value = std::clamp(value, min_value, max_value);
+            return margin_top + plot_height -
+                   ((clamped_value - min_value) / (max_value - min_value)) *
+                       plot_height;
         }
     }  // namespace
 
@@ -85,14 +78,6 @@ namespace Infrastructure {
         double plot_w = width - margin_left - margin_right;
         double plot_h = height - margin_top - margin_bottom;
 
-        auto x_of = [&](int i) -> double {
-            return margin_left + (plot_w * i) / (max_points - 1);
-        };
-        auto y_of = [&](double v) -> double {
-            double c = std::clamp(v, mn, mx);
-            return margin_top + plot_h - ((c - mn) / (mx - mn)) * plot_h;
-        };
-
         std::ostringstream svg;
         svg << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
         svg << "<svg xmlns=\"http://www.w3.org/2000/svg\" "
@@ -117,11 +102,12 @@ namespace Infrastructure {
         for (int i = 0; i <= 6; ++i) {
             double frac = i / 6.0;
             double v = mn + (mx - mn) * frac;
-            double y = y_of(v);
+            double y = y_of(v, plot_h, mn, mx);
             svg << "<line class=\"grid\" x1=\"" << margin_left << "\" y1=\"" << y
                 << "\" x2=\"" << width - margin_right << "\" y2=\"" << y << "\"/>\n";
             svg << "<text x=\"" << margin_left - 8 << "\" y=\"" << (y + 4)
-                << "\" text-anchor=\"end\">" << fmt(v) << "</text>\n";
+                << "\" text-anchor=\"end\">" << std::format("{:.0f}", v)
+                << "</text>\n";
         }
 
         // Оси
@@ -135,13 +121,14 @@ namespace Infrastructure {
         // Подписи оси X (каждый N-й)
         int label_step = std::max(1, (max_points - 1) / 10);
         for (int i = 0; i < max_points; i += label_step) {
-            double x = x_of(i);
+            double x = x_of(i, plot_w, max_points);
             svg << "<text x=\"" << x << "\" y=\"" << height - margin_bottom + 18
                 << "\" text-anchor=\"middle\">" << (i + 1) << "</text>\n";
         }
         // подпись последней точки всегда
         if ((max_points - 1) % label_step != 0) {
-            svg << "<text x=\"" << x_of(max_points - 1) << "\" y=\""
+            svg << "<text x=\"" << x_of(max_points - 1, plot_w, max_points)
+                << "\" y=\""
                 << height - margin_bottom + 18 << "\" text-anchor=\"middle\">"
                 << max_points << "</text>\n";
         }
@@ -159,7 +146,8 @@ namespace Infrastructure {
             std::ostringstream points;
             for (size_t i = 0; i < s.values.size(); ++i) {
                 if (i) points << " ";
-                points << x_of(static_cast<int>(i)) << "," << y_of(s.values[i]);
+                points << x_of(static_cast<int>(i), plot_w, max_points) << ","
+                       << y_of(s.values[i], plot_h, mn, mx);
             }
             svg << "<polyline class=\"line\" stroke=\"" << s.color
                 << "\" points=\"" << points.str() << "\"/>\n";

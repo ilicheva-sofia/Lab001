@@ -85,7 +85,6 @@ namespace Domain {
 
             players.save(player);
             tables.save(table);
-
         } catch (const Exceptions::InvalidMoneyOperation& e) {
             logger.log_exceptions(std::format("Ошибка списания у игрока {}: {}",
                                               pid.get_id(), e.what()));
@@ -130,19 +129,14 @@ namespace Domain {
                                bots.size()));
 
         std::map<std::string, std::vector<double>> balances;
-        std::vector<std::string> series_names;
-        std::vector<std::string> series_colors;
-
-        series_names.push_back("Касса стола");
-        series_colors.push_back("#4daf4a");
         balances["__table__"] = {};
 
         static const std::vector<std::string> palette = {
             "#e41a1c", "#555555"};
+        std::vector<std::string> bot_colors;
         for (size_t i = 0; i < bots.size(); ++i) {
             std::string key = "bot_" + std::to_string(i + 1);
-            series_names.push_back(bots[i]->get_name());
-            series_colors.push_back(palette[i % palette.size()]);
+            bot_colors.push_back(palette[i % palette.size()]);
             balances[key] = {};
         }
         // Заполняем начальные значения
@@ -228,7 +222,7 @@ namespace Domain {
             {"Касса стола", "#4daf4a", balances["__table__"]});
         // Боты
         for (size_t i = 0; i < bots.size(); ++i) {
-            series.push_back({bots[i]->get_name(), series_colors[i + 1],
+            series.push_back({bots[i]->get_name(), bot_colors[i],
                                 balances["bot_" + std::to_string(i + 1)]});
         }
         Infrastructure::SvgChart::write(
