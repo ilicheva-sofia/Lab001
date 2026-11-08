@@ -20,6 +20,11 @@ namespace Aggregates {
         bets.push_back(PlacedBet{id, std::move(bet)});
     }
 
+    void Table::restore_bet(Values::PlayerId id,
+                            std::unique_ptr<Bets::Bet> bet) {
+        if (bet) bets.push_back(PlacedBet{id, std::move(bet)});
+    }
+
     Values::SpinResult Table::spin(Ports::RandomGenerator& rg) {
         Values::RouletteNumber winning_number = rg.next();
 

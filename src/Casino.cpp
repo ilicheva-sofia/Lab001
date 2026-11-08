@@ -17,7 +17,7 @@
 void bot_play() {
     // new Random Generator (pure for  game,  fake for test)
     // 42 - seed
-    auto rng = std::make_unique<Infrastructure::RealRandomGenerator>(42);
+    auto rng = std::make_unique<Infrastructure::RealRandomGenerator>(7742);
     //    rng = std::make_unique<FakeGenerator>();
 
     // new logger :  memory, file, sql
@@ -107,84 +107,102 @@ void human_play() {
     playerRepo->save(player1);
     loggingService->log_newPlayer(*player1);
 
-    std::cout << "Введите сумму ставки игрока :";
-    std::cin >> pamount;
-
     constexpr std::string_view color_set = "цЦcC";
     constexpr std::string_view number_set = "чЧnN";
-    std::cout << "Введите тип ставки игрока: цвет или число (" << color_set
-              << "/" << number_set << ")";
-    std::string ans;
-    std::cin >> ans;
-    std::unique_ptr<Bets::Bet> bet;
-    if (color_set.find(ans) != std::string::npos) {
-        constexpr std::string_view red_set = "кКrR";
-        constexpr std::string_view black_set = "чЧbB";
-        std::cout << "Введите цвет (" << red_set << "/" << black_set << ")";
-        std::string cc;
-        std::cin >> cc;
-        if (red_set.find(cc) != std::string::npos) {
-            bet = std::make_unique<Bets::ColorBet>(Values::Money{pamount},
-                                                   Values::Color::Red);
-        } else if (black_set.find(cc) != std::string::npos) {
-            bet = std::make_unique<Bets::ColorBet>(Values::Money{pamount},
-                                                   Values::Color::Black);
+
+    while (true) {
+        std::cout << "Введите сумму ставки игрока :";
+        std::cin >> pamount;
+
+        std::cout << "Введите тип ставки игрока: цвет или число (" << color_set
+                  << "/" << number_set << ")";
+        std::string ans;
+        std::cin >> ans;
+        std::unique_ptr<Bets::Bet> bet;
+        if (color_set.find(ans) != std::string::npos) {
+            constexpr std::string_view red_set = "кКrR";
+            constexpr std::string_view black_set = "чЧbB";
+            std::cout << "Введите цвет (" << red_set << "/" << black_set
+                      << ")";
+            std::string cc;
+            std::cin >> cc;
+            if (red_set.find(cc) != std::string::npos) {
+                bet = std::make_unique<Bets::ColorBet>(Values::Money{pamount},
+                                                       Values::Color::Red);
+            } else if (black_set.find(cc) != std::string::npos) {
+                bet = std::make_unique<Bets::ColorBet>(Values::Money{pamount},
+                                                       Values::Color::Black);
+            } else {
+                std::cout << "Недопустимый ответ. Выходим" << std::endl;
+                return;
+            }
+
+        } else if (number_set.find(ans) != std::string::npos) {
+            int digit;
+            std::cout << "Введите число ( от 0 до 36 )";
+
+            std::cin >> digit;
+            if (!std::cin.good() || digit < 0 || digit > 36) {
+                std::cout << "Недопустимое число. Выходим" << std::endl;
+                return;
+            }
+            std::cout << "Введено число ( от 0 до 36 )" << digit << std::endl;
+
+            bet = std::make_unique<Bets::SingleNumberBet>(
+                Values::Money{pamount},
+                Values::RouletteNumber{static_cast<std::int8_t>(digit)});
+
         } else {
             std::cout << "Недопустимый ответ. Выходим" << std::endl;
             return;
         }
-
-    } else if (number_set.find(ans) != std::string::npos) {
-        int digit;
-        std::cout << "Введите число ( от 0 до 36 )";
-
-        std::cin >> digit;
-        std::cout << "Введнно ( от 0 до 36 )" << digit << std::endl;
-
-        bet = std::make_unique<Bets::SingleNumberBet>(
-            Values::Money{pamount}, Values::RouletteNumber{digit});
-
-    } else {
-        std::cout << "Недопустимый ответ. Выходим" << std::endl;
-        return;
-    }
-    try {
-        gameService.place_bet(pid, tid, std::move(bet));
-    } catch (const Exceptions::InvalidNumber& e) {
-        std::cout << "Недопустимая ставка. Выходим" << std::endl;
-        //        std::cerr << e.what() << '\n';
-        return;
-    }
-    std::cout << "Крутим рулетку" << std::endl;
-
-    Values::SpinResult result = gameService.spin(tid, *rng);
-    std::string colorStr =
-        (result.get_number().color() == Values::Color::Red)     ? "КРАСНОЕ"
-        : (result.get_number().color() == Values::Color::Black) ? "ЧЕРНОЕ"
-                                                                : "ЗЕРО";
-    std::cout << std::format("  Выпало число: {} ({})\n",
-                             result.get_number().value(), colorStr);
-
-    if (result.get_status() == Values::SpinStatus::Cancelled) {
-        std::cout << "Стол обанкротился!" << std::endl;
-        return;
-    }
-
-    bool won = false;
-    // single player
-
-    for (const auto& payout : result.get_payouts()) {
-        if (payout.get_player().get_id() == pid.get_id() &&
-            payout.get_amount() > Values::Money::zero()) {
-            won = true;
-            std::cout << std::format("ставка сыграла, выигрыш: {} \n",
-                                     payout.get_amount());
-            break;
+        try {
+            gameService.place_bet(pid, tid, std::move(bet));
+        } catch (const Exceptions::InvalidNumber& e) {
+            std::cout << "Недопустимая ставка. Выходим" << std::endl;
+            return;
         }
-    }
+        std::cout << "Крутим рулетку" << std::endl;
 
-    if (!won) {
-        std::cout << "Игрок  проиграл!" << std::endl;
+        Values::SpinResult result = gameService.spin(tid, *rng);
+        std::string colorStr =
+            (result.get_number().color() == Values::Color::Red)     ? "КРАСНОЕ"
+            : (result.get_number().color() == Values::Color::Black) ? "ЧЕРНОЕ"
+                                                                    : "ЗЕРО";
+        std::cout << std::format("  Выпало число: {} ({})\n",
+                                 result.get_number().value(), colorStr);
+
+        if (result.get_status() == Values::SpinStatus::Cancelled) {
+            std::cout << "Стол обанкротился!" << std::endl;
+            return;
+        }
+
+        bool won = false;
+        for (const auto& payout : result.get_payouts()) {
+            if (payout.get_player().get_id() == pid.get_id() &&
+                payout.get_amount() > Values::Money::zero()) {
+                won = true;
+                std::cout << std::format("ставка сыграла, выигрыш: {} \n",
+                                         payout.get_amount());
+                break;
+            }
+        }
+
+        if (!won) {
+            std::cout << "Игрок  проиграл!" << std::endl;
+        }
+
+        // Вопрос: играть ещё?
+        constexpr std::string_view yes_set = "дДyY";
+        std::string again;
+        std::cout << "Сделать ещё ставку? (д/н) ";
+        std::cin >> again;
+        if (yes_set.find(again) == std::string::npos) {
+            auto final_balance = playerRepo->load(pid)->get_balance();
+            std::cout << std::format("Игра окончена. Итоговый баланс: {}\n",
+                                     final_balance);
+            return;
+        }
     }
 }
 

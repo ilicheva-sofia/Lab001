@@ -35,9 +35,11 @@ namespace Aggregates {
         Values::TableId get_id() const { return id; }
 
         void accept_bet(Values::PlayerId id, std::unique_ptr<Bets::Bet> bet);
+        void restore_bet(Values::PlayerId id, std::unique_ptr<Bets::Bet> bet);
         Values::SpinResult spin(Ports::RandomGenerator& rg);
 
         Values::Money get_balance() const { return balance; }
         const Values::Tablelimits& get_limits() const { return limits; }
+        const std::vector<PlacedBet>& get_bets() const { return bets; }
     };
 }  // namespace Aggregates

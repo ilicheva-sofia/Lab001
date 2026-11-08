@@ -4,8 +4,17 @@ add_executable(run_all_tests
     MoneyTest.cpp
     RouletteNumberTest.cpp
     BetPayoutTest.cpp
+    BetDescribeTest.cpp
+    PlayerIdTest.cpp
+    PlayerTest.cpp
     TableLimitsTest.cpp
     TableAggregateTest.cpp
+    BotStrategyTest.cpp
+    GameServiceTest.cpp
+    SpinResultTest.cpp
+    RepositoryTest.cpp
+    InfrastructureTest.cpp
+    SvgChartTest.cpp
 )
 
 

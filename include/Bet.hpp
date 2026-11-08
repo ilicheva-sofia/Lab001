@@ -23,6 +23,7 @@ namespace Bets {
         ColorBet(Values::Money amount, Values::Color color);
 
         Values::Money get_amount() const override;
+        Values::Color get_color() const { return color; }
         Values::Money payout(
             const Values::RouletteNumber& result) const override;
         std::string describe() const override;
@@ -37,6 +38,7 @@ namespace Bets {
         SingleNumberBet(Values::Money amount, Values::RouletteNumber number);
 
         Values::Money get_amount() const override;
+        const Values::RouletteNumber& get_number() const { return number; }
         Values::Money payout(
             const Values::RouletteNumber& result) const override;
         std::string describe() const override;

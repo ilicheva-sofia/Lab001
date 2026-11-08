@@ -45,6 +45,7 @@ add_library(casino_lib
     src/Tablelimits.cpp
     src/BotStrategy.cpp
     src/FileTableRepository.cpp
+    src/SvgChart.cpp
 
 )
 target_include_directories(casino_lib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
@@ -57,3 +58,33 @@ target_link_libraries(lab001 PRIVATE casino_lib)
 
 enable_testing()
 add_subdirectory(tests)
+
+# Coverage: складываем .gcov/.gcda/.gcno в build/coverage, а не в корень
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(COVERAGE_DIR "${CMAKE_BINARY_DIR}/coverage")
+    file(MAKE_DIRECTORY "${COVERAGE_DIR}")
+
+    # gcov пишет .gcov в CWD. cmake -P скрипт запускает gcov в CWD=COVERAGE_DIR
+    # с -o каталогу .gcda — отчёты остаются в build/coverage.
+    file(WRITE "${CMAKE_BINARY_DIR}/_coverage.cmake"
+"set(COV_DIR \"${COVERAGE_DIR}\")
+set(BUILD_DIR \"${CMAKE_BINARY_DIR}\")
+file(GLOB_RECURSE GCDA_FILES \"\${BUILD_DIR}/*.gcda\")
+foreach(f \${GCDA_FILES})
+  get_filename_component(dir \${f} DIRECTORY)
+  execute_process(COMMAND gcov -o \${dir} \${f}
+    WORKING_DIRECTORY \${COV_DIR}
+    OUTPUT_QUIET ERROR_QUIET)
+endforeach()
+message(STATUS \"Отчёты .gcov в: \${COV_DIR}\")
+")
+    add_custom_target(coverage
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/_coverage.cmake
+        COMMENT "Generating .gcov reports in ${COVERAGE_DIR}"
+        VERBATIM)
+
+    add_custom_target(coverage_clean
+        COMMAND ${CMAKE_COMMAND} -E remove_directory "${COVERAGE_DIR}"
+        COMMENT "Cleaning coverage reports"
+        VERBATIM)
+endif()

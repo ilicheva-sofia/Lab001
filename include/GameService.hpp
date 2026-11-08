@@ -1,6 +1,9 @@
 #pragma once
+#include <map>
 #include <memory>
 #include <optional>
+#include <string>
+#include <vector>
 
 #include "Bet.hpp"
 #include "BotStrategy.hpp"
@@ -19,6 +22,10 @@ namespace Domain {
         Repository::PlayerRepository& players;
         Repository::TableRepository& tables;
         Infrastructure::LoggingService& logger;
+
+        void record_balances(
+            Values::TableId tid, std::size_t bot_count,
+            std::map<std::string, std::vector<double>>& balances);
 
        public:
         GameService(Repository::PlayerRepository& p,

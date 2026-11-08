@@ -1,9 +1,13 @@
 #include "GameService.hpp"
 
+#include <algorithm>
 #include <format>
 #include <iostream>
+#include <map>
+#include <vector>
 
 #include "DomainError.hpp"
+#include "SvgChart.hpp"
 
 namespace Domain {
 
@@ -96,12 +100,55 @@ namespace Domain {
                                table->get_balance()));
     }
 
+    void GameService::record_balances(
+        Values::TableId tid, std::size_t bot_count,
+        std::map<std::string, std::vector<double>>& balances) {
+        auto table = tables.load(tid);
+        if (table) {
+            balances["__table__"].push_back(
+                static_cast<double>(table->get_balance().get_kopecks()) /
+                100.0);
+        }
+
+        for (std::size_t i = 0; i < bot_count; ++i) {
+            Values::PlayerId pid(static_cast<std::int64_t>(i + 1));
+            auto player = players.load(pid);
+            auto& series = balances["bot_" + std::to_string(i + 1)];
+            double value =
+                player
+                    ? static_cast<double>(player->get_balance().get_kopecks()) /
+                          100.0
+                    : (series.empty() ? 0.0 : series.back());
+            series.push_back(value);
+        }
+    }
+
     void GameService::startGame(
         std::vector<std::shared_ptr<Domain::BotStrategy>>& bots,
         Values::TableId tid, Ports::RandomGenerator& rng, int max_rounds) {
         logger.log(std::format("Запуск симуляции казино для {} ботов...\n",
                                bots.size()));
 
+        std::map<std::string, std::vector<double>> balances;
+        std::vector<std::string> series_names;
+        std::vector<std::string> series_colors;
+
+        series_names.push_back("Касса стола");
+        series_colors.push_back("#4daf4a");
+        balances["__table__"] = {};
+
+        static const std::vector<std::string> palette = {
+            "#e41a1c", "#555555"};
+        for (size_t i = 0; i < bots.size(); ++i) {
+            std::string key = "bot_" + std::to_string(i + 1);
+            series_names.push_back(bots[i]->get_name());
+            series_colors.push_back(palette[i % palette.size()]);
+            balances[key] = {};
+        }
+        // Заполняем начальные значения
+        record_balances(tid, bots.size(), balances);
+
+        // раунды
         for (int round = 1; round <= max_rounds; ++round) {
             logger.log(std::format("--- РАУНД {:02} ---", round));
 
@@ -163,6 +210,9 @@ namespace Domain {
             }
             std::cout << "\n";
 
+            // Фиксируем балансы после раунда
+            record_balances(tid, bots.size(), balances);
+
             // Проверка на глобальный форс-мажор банкротства стола
             if (result.get_status() == Values::SpinStatus::Cancelled) {
                 std::cout << "[КРИТ] Симуляция аварийно остановлена: Стол "
@@ -170,6 +220,21 @@ namespace Domain {
                 break;
             }
         }
+
+        // Генерируем SVG-график балансов
+        std::vector<Infrastructure::Series> series;
+        // Стол
+        series.push_back(
+            {"Касса стола", "#4daf4a", balances["__table__"]});
+        // Боты
+        for (size_t i = 0; i < bots.size(); ++i) {
+            series.push_back({bots[i]->get_name(), series_colors[i + 1],
+                                balances["bot_" + std::to_string(i + 1)]});
+        }
+        Infrastructure::SvgChart::write(
+            "balances_chart.svg", "Балансы ботов и стола по раундам",
+            series);
+        std::cout << "График сохранён в balances_chart.svg\n";
 
         logger.log("=== СИМУЛЯЦИЯ ИГРЫ УСПЕШНО ЗАВЕРШЕНА ===");
     }
